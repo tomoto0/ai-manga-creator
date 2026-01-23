@@ -66,3 +66,7 @@
 - [x] Update generatePanelImages API to generate one by one
 - [x] Test consistency across multiple panels
 - [x] Create new checkpoint
+
+## Phase 10: Home Page UI Cleanup
+- [x] Remove unnecessary panel images from home page hero section
+- [x] Create new checkpoint

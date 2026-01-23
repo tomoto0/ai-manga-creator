@@ -94,24 +94,7 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Hero Image/Preview */}
-          <div className="mt-16 relative">
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10" />
-            <div className="relative rounded-2xl overflow-hidden border border-border/50 shadow-2xl glow-purple">
-              <div className="aspect-video bg-card flex items-center justify-center">
-                <div className="grid grid-cols-3 gap-4 p-8 w-full max-w-4xl">
-                  {[1, 2, 3, 4, 5, 6].map((i) => (
-                    <div key={i} className="manga-panel aspect-square flex items-center justify-center">
-                      <div className="text-center">
-                        <Image className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                        <span className="text-xs text-muted-foreground">Panel {i}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+
         </div>
       </section>
 
