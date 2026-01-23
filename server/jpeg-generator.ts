@@ -55,6 +55,7 @@ function createTextSvg(text: string, width: number, height: number, options: {
   borderColor?: string;
   borderRadius?: number;
   padding?: number;
+  fontFamily?: string;
 } = {}): string {
   const {
     fontSize = 14,
@@ -65,6 +66,7 @@ function createTextSvg(text: string, width: number, height: number, options: {
     borderColor,
     borderRadius = 0,
     padding = 10,
+    fontFamily = 'Noto Sans CJK JP, sans-serif',
   } = options;
 
   // テキストを折り返し
@@ -95,7 +97,7 @@ function createTextSvg(text: string, width: number, height: number, options: {
 
   const textElements = displayLines.map((line, i) => 
     `<text x="50%" y="${startY + i * lineHeight}" text-anchor="${textAlign}" 
-           font-family="sans-serif" font-size="${fontSize}" font-weight="${fontWeight}" 
+           font-family="${fontFamily}" font-size="${fontSize}" font-weight="${fontWeight}" 
            fill="${color}">${escapeXml(line)}</text>`
   ).join('');
 

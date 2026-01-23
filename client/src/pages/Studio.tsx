@@ -58,6 +58,7 @@ export default function Studio() {
   const [generatingImages, setGeneratingImages] = useState<number[]>([]);
   const [editingPanel, setEditingPanel] = useState<number | null>(null);
   const [projectId, setProjectId] = useState<number | null>(null);
+  const [jpegPreviewUrl, setJpegPreviewUrl] = useState<string | null>(null);
 
   const fetchNewsMutation = trpc.ai.fetchLatestNews.useMutation();
   const generateStoryMutation = trpc.ai.generateStoryProposals.useMutation();
@@ -228,7 +229,10 @@ export default function Studio() {
         })),
       });
       
-      // Download the image
+      // Show preview modal
+      setJpegPreviewUrl(result.url);
+      
+      // Also trigger download
       const link = document.createElement('a');
       link.href = result.url;
       link.download = `manga-${selectedStory.plotTitle.replace(/\s+/g, '-')}.jpg`;
@@ -717,6 +721,31 @@ export default function Studio() {
           </div>
         )}
       </main>
+
+      {/* JPEG Preview Modal */}
+      {jpegPreviewUrl && (
+        <div 
+          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
+          onClick={() => setJpegPreviewUrl(null)}
+        >
+          <div className="relative max-w-7xl max-h-[90vh] w-full">
+            <Button
+              variant="outline"
+              size="icon"
+              className="absolute top-4 right-4 z-10 bg-background/80 backdrop-blur-sm hover:bg-background"
+              onClick={() => setJpegPreviewUrl(null)}
+            >
+              <X className="w-4 h-4" />
+            </Button>
+            <img 
+              src={jpegPreviewUrl} 
+              alt="Generated Manga" 
+              className="w-full h-full object-contain rounded-lg"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

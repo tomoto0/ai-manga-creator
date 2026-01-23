@@ -70,3 +70,10 @@
 ## Phase 10: Home Page UI Cleanup
 - [x] Remove unnecessary panel images from home page hero section
 - [x] Create new checkpoint
+
+## Phase 11: JPEG Generation & UI Improvements
+- [x] Fix Japanese font rendering in JPEG generation
+- [x] Improve art style to anime/fantasy/beautiful/cute style
+- [x] Add close button for JPEG preview modal
+- [x] Test JPEG generation with Japanese text
+- [x] Create new checkpoint

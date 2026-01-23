@@ -477,7 +477,10 @@ export async function generatePanelImage(
       ? "Establish consistent character designs, art style, and visual tone for the entire manga series. Remember character appearances, clothing, and distinctive features."
       : "Maintain the EXACT SAME character designs, art style, and visual tone as the previous panel. Keep character appearances, clothing, facial features, and artistic style completely consistent.";
     
-    const enhancedPrompt = `${imagePrompt}. ${styleConsistencyNote} High quality manga/anime art style, detailed illustration, professional comic book quality, clean lines, vibrant colors.`;
+    // 日本のアニメ風、ファンタジー、美人、かわいい系のスタイルを強調
+    const styleEnhancement = "Japanese anime art style, fantasy aesthetic, beautiful and cute character designs, detailed and expressive eyes, soft shading, vibrant colors, professional manga illustration quality, clean linework, dynamic composition";
+    
+    const enhancedPrompt = `${imagePrompt}. ${styleConsistencyNote} ${styleEnhancement}`;
     
     const options: {
       prompt: string;
