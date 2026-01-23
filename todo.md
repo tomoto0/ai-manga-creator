@@ -53,3 +53,9 @@
 - [x] Add meta description (50-160 characters)
 - [x] Add meta keywords
 - [x] Create new checkpoint
+
+## Phase 8: OGP Image Setup
+- [x] Generate OGP image (1200x630px)
+- [x] Add image to public folder
+- [x] Add OGP meta tags to index.html
+- [x] Create new checkpoint
