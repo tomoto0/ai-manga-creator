@@ -218,6 +218,115 @@ export const appRouter = router({
         }
       }),
   }),
+
+  // テンプレート関連
+  templates: router({
+    // テンプレート一覧取得（自分のテンプレート）
+    list: protectedProcedure.query(async ({ ctx }) => {
+      return db.getUserTemplates(ctx.user.id);
+    }),
+
+    // 公開テンプレート一覧取得
+    listPublic: publicProcedure.query(async () => {
+      return db.getPublicTemplates();
+    }),
+
+    // テンプレート詳細取得
+    get: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ ctx, input }) => {
+        const template = await db.getTemplate(input.id);
+        if (!template) {
+          throw new TRPCError({ code: "NOT_FOUND" });
+        }
+        // 自分のテンプレートか公開テンプレートのみアクセス可能
+        if (template.userId !== ctx.user.id && !template.isPublic) {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        return template;
+      }),
+
+    // テンプレート作成
+    create: protectedProcedure
+      .input(z.object({
+        name: z.string().min(1),
+        description: z.string().optional(),
+        thumbnailUrl: z.string().optional(),
+        styleSettings: z.string().optional(),
+        layout: z.enum(["2x2", "2x3", "3x2", "1-column"]).optional(),
+        panelCount: z.number().min(2).max(8).optional(),
+        defaultBubbleShape: z.enum(["round", "square", "jagged"]).optional(),
+        defaultDialoguePosition: z.enum(["top", "middle", "bottom"]).optional(),
+        samplePrompts: z.string().optional(),
+        isPublic: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        return db.createTemplate({
+          userId: ctx.user.id,
+          name: input.name,
+          description: input.description,
+          thumbnailUrl: input.thumbnailUrl,
+          styleSettings: input.styleSettings,
+          layout: input.layout || "2x3",
+          panelCount: input.panelCount || 4,
+          defaultBubbleShape: input.defaultBubbleShape || "round",
+          defaultDialoguePosition: input.defaultDialoguePosition || "bottom",
+          samplePrompts: input.samplePrompts,
+          isPublic: input.isPublic || false,
+        });
+      }),
+
+    // テンプレート更新
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        name: z.string().min(1).optional(),
+        description: z.string().optional(),
+        thumbnailUrl: z.string().optional(),
+        styleSettings: z.string().optional(),
+        layout: z.enum(["2x2", "2x3", "3x2", "1-column"]).optional(),
+        panelCount: z.number().min(2).max(8).optional(),
+        defaultBubbleShape: z.enum(["round", "square", "jagged"]).optional(),
+        defaultDialoguePosition: z.enum(["top", "middle", "bottom"]).optional(),
+        samplePrompts: z.string().optional(),
+        isPublic: z.boolean().optional(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const template = await db.getTemplate(input.id);
+        if (!template || template.userId !== ctx.user.id) {
+          throw new TRPCError({ code: "NOT_FOUND" });
+        }
+        const { id, ...updateData } = input;
+        return db.updateTemplate(id, updateData);
+      }),
+
+    // テンプレート削除
+    delete: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const template = await db.getTemplate(input.id);
+        if (!template || template.userId !== ctx.user.id) {
+          throw new TRPCError({ code: "NOT_FOUND" });
+        }
+        await db.deleteTemplate(input.id);
+        return { success: true };
+      }),
+
+    // テンプレート使用回数をインクリメント
+    use: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        const template = await db.getTemplate(input.id);
+        if (!template) {
+          throw new TRPCError({ code: "NOT_FOUND" });
+        }
+        if (template.userId !== ctx.user.id && !template.isPublic) {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        await db.incrementTemplateUsage(input.id);
+        return template;
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

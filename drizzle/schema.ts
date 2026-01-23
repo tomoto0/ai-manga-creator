@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, boolean } from "drizzle-orm/mysql-core";
+import { boolean, int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 import { relations } from "drizzle-orm";
 
 /**
@@ -118,5 +118,37 @@ export const completedMangaRelations = relations(completedManga, ({ one }) => ({
   project: one(mangaProjects, {
     fields: [completedManga.projectId],
     references: [mangaProjects.id],
+  }),
+}));
+
+/**
+ * テンプレートテーブル
+ * 過去に作成した漫画をテンプレートとして保存
+ */
+export const mangaTemplates = mysqlTable("manga_templates", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  thumbnailUrl: text("thumbnailUrl"), // テンプレートのサムネイル
+  styleSettings: text("styleSettings"), // JSON形式のスタイル設定
+  layout: mysqlEnum("layout", ["2x2", "2x3", "3x2", "1-column"]).default("2x3"),
+  panelCount: int("panelCount").default(4),
+  defaultBubbleShape: mysqlEnum("defaultBubbleShape", ["round", "square", "jagged"]).default("round"),
+  defaultDialoguePosition: mysqlEnum("defaultDialoguePosition", ["top", "middle", "bottom"]).default("bottom"),
+  samplePrompts: text("samplePrompts"), // JSON形式のサンプルプロンプト
+  isPublic: boolean("isPublic").default(false), // 他のユーザーに公開するか
+  usageCount: int("usageCount").default(0), // 使用回数
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type MangaTemplate = typeof mangaTemplates.$inferSelect;
+export type InsertMangaTemplate = typeof mangaTemplates.$inferInsert;
+
+export const mangaTemplatesRelations = relations(mangaTemplates, ({ one }) => ({
+  user: one(users, {
+    fields: [mangaTemplates.userId],
+    references: [users.id],
   }),
 }));

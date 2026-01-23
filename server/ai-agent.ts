@@ -122,11 +122,11 @@ export async function fetchLatestNewsFromSources(): Promise<Array<{
               messages: [
                 {
                   role: "system",
-                  content: "You are a news aggregator. Generate REAL, RECENT news headlines based on actual current events. Return ONLY valid JSON.",
+                  content: "You are a news aggregator. Generate REAL, CURRENT news headlines based on actual events happening TODAY or within the last 24 hours. Focus on breaking news and trending topics. Return ONLY valid JSON.",
                 },
                 {
                   role: "user",
-                  content: `Generate 1 REAL, RECENT news article from ${source.name} (${source.category} news). Return ONLY valid JSON with: title (string), summary (2-3 sentences), url (realistic URL like ${source.url}...)`,
+                  content: `Generate 1 REAL, CURRENT news article from ${source.name} (${source.category} news) that is happening TODAY (${new Date().toLocaleDateString()}). Focus on breaking news or trending topics from the last 24 hours. Return ONLY valid JSON with: title (string), summary (2-3 sentences), url (realistic URL like ${source.url}...)`,
                 },
               ],
             });
@@ -190,11 +190,11 @@ export async function fetchLatestNewsFromSources(): Promise<Array<{
             messages: [
               {
                 role: "system",
-                content: "You are a news aggregator. Generate REAL, RECENT news headlines. Return ONLY valid JSON.",
+                content: "You are a news aggregator. Generate REAL, CURRENT news headlines based on actual events happening TODAY or within the last 24 hours. Focus on breaking news and trending topics. Return ONLY valid JSON.",
               },
               {
                 role: "user",
-                content: `Generate 1 REAL, RECENT ${category} news article. Return ONLY valid JSON with: title, summary, url, source`,
+                content: `Generate 1 REAL, CURRENT ${category} news article that is happening TODAY (${new Date().toLocaleDateString()}). Focus on breaking news or trending topics from the last 24 hours. Return ONLY valid JSON with: title, summary, url, source`,
               },
             ],
           });

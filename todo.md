@@ -87,3 +87,15 @@
 - [x] Update JPEG generator to support different layouts
 - [x] Test all combinations
 - [x] Create new checkpoint
+
+## Phase 13: Template Gallery Feature & News Update
+- [x] Add manga_templates table to database schema
+- [x] Create template CRUD operations in db.ts
+- [x] Add template API endpoints in routers.ts
+- [x] Create Templates page UI
+- [x] Add "Save as Template" button in preview step
+- [x] Add "Use Template" option in story step
+- [x] Verify JPEG generation works correctly
+- [x] Verify X posting functionality
+- [x] Create new checkpoint
+- [x] Update news fetching to get latest news (not old cached news)

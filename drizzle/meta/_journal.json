@@ -22,6 +22,13 @@
       "when": 1769176728088,
       "tag": "0002_flaky_madame_masque",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1769177626058,
+      "tag": "0003_foamy_jackpot",
+      "breakpoints": true
     }
   ]
 }

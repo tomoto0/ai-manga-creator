@@ -272,9 +272,15 @@ export default function Studio() {
 
   const handleShareToX = () => {
     if (!selectedStory) return;
-    const text = encodeURIComponent(`Check out my AI-generated manga: "${selectedStory.plotTitle}" - Created with AI Manga Creator`);
-    const url = `https://twitter.com/intent/tweet?text=${text}`;
-    window.open(url, '_blank');
+    const mangaTitle = selectedStory.plotTitle;
+    const text = encodeURIComponent(`🎨 AIで漫画を作りました！\n\n「${mangaTitle}」\n\n#AI漫画 #AIアート #AIMangaCreator`);
+    // 画像URLがあれば含める
+    let shareUrl = `https://twitter.com/intent/tweet?text=${text}`;
+    if (jpegPreviewUrl) {
+      shareUrl += `&url=${encodeURIComponent(jpegPreviewUrl)}`;
+    }
+    window.open(shareUrl, '_blank');
+    toast.success("Xへの共有画面を開きました");
   };
 
   const getStepIndex = (step: WorkflowStep) => STEPS.findIndex(s => s.id === step);

@@ -1,6 +1,6 @@
 import { eq, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, mangaProjects, mangaPanels, completedManga, InsertMangaProject, InsertMangaPanel, InsertCompletedManga } from "../drizzle/schema";
+import { InsertUser, users, mangaProjects, mangaPanels, completedManga, mangaTemplates, InsertMangaProject, InsertMangaPanel, InsertCompletedManga, InsertMangaTemplate } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -176,4 +176,59 @@ export async function updateCompletedManga(id: number, data: Partial<InsertCompl
   if (!db) throw new Error("Database not available");
   
   return db.update(completedManga).set({ ...data, updatedAt: new Date() }).where(eq(completedManga.id, id));
+}
+
+// Template operations
+export async function createTemplate(data: InsertMangaTemplate) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(mangaTemplates).values(data);
+  return { id: Number(result[0].insertId), ...data };
+}
+
+export async function getUserTemplates(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return db.select().from(mangaTemplates).where(eq(mangaTemplates.userId, userId)).orderBy(desc(mangaTemplates.createdAt));
+}
+
+export async function getPublicTemplates() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return db.select().from(mangaTemplates).where(eq(mangaTemplates.isPublic, true)).orderBy(desc(mangaTemplates.usageCount));
+}
+
+export async function getTemplate(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.select().from(mangaTemplates).where(eq(mangaTemplates.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateTemplate(id: number, data: Partial<InsertMangaTemplate>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return db.update(mangaTemplates).set({ ...data, updatedAt: new Date() }).where(eq(mangaTemplates.id, id));
+}
+
+export async function deleteTemplate(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return db.delete(mangaTemplates).where(eq(mangaTemplates.id, id));
+}
+
+export async function incrementTemplateUsage(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const template = await getTemplate(id);
+  if (template) {
+    return db.update(mangaTemplates).set({ usageCount: (template.usageCount || 0) + 1 }).where(eq(mangaTemplates.id, id));
+  }
 }
