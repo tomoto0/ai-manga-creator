@@ -1,6 +1,6 @@
-import { eq } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, mangaProjects, mangaPanels, completedManga, InsertMangaProject, InsertMangaPanel, InsertCompletedManga } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -89,4 +89,91 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// Manga Projects
+export async function createMangaProject(data: InsertMangaProject) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(mangaProjects).values(data);
+  // 挿入後、作成されたプロジェクトを取得
+  const projects = await db.select().from(mangaProjects).where(eq(mangaProjects.userId, data.userId)).orderBy(desc(mangaProjects.id)).limit(1);
+  return projects.length > 0 ? projects[0] : { id: 0, ...data, createdAt: new Date(), updatedAt: new Date() };
+}
+
+export async function getMangaProject(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.select().from(mangaProjects).where(eq(mangaProjects.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserMangaProjects(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return db.select().from(mangaProjects).where(eq(mangaProjects.userId, userId)).orderBy(desc(mangaProjects.createdAt));
+}
+
+export async function updateMangaProject(id: number, data: Partial<InsertMangaProject>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return db.update(mangaProjects).set({ ...data, updatedAt: new Date() }).where(eq(mangaProjects.id, id));
+}
+
+// Manga Panels
+export async function createMangaPanel(data: InsertMangaPanel) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(mangaPanels).values(data);
+  return data;
+}
+
+export async function getProjectPanels(projectId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return db.select().from(mangaPanels).where(eq(mangaPanels.projectId, projectId)).orderBy(mangaPanels.panelNumber);
+}
+
+export async function updateMangaPanel(id: number, data: Partial<InsertMangaPanel>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return db.update(mangaPanels).set({ ...data, updatedAt: new Date() }).where(eq(mangaPanels.id, id));
+}
+
+// Completed Manga
+export async function createCompletedManga(data: InsertCompletedManga) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.insert(completedManga).values(data);
+  // 挿入後、作成された漫画を取得
+  const manga = await db.select().from(completedManga).where(eq(completedManga.userId, data.userId)).orderBy(desc(completedManga.id)).limit(1);
+  return manga.length > 0 ? manga[0] : { id: 0, ...data, createdAt: new Date(), updatedAt: new Date() };
+}
+
+export async function getUserCompletedManga(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return db.select().from(completedManga).where(eq(completedManga.userId, userId)).orderBy(desc(completedManga.createdAt));
+}
+
+export async function getCompletedManga(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.select().from(completedManga).where(eq(completedManga.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateCompletedManga(id: number, data: Partial<InsertCompletedManga>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  return db.update(completedManga).set({ ...data, updatedAt: new Date() }).where(eq(completedManga.id, id));
+}
