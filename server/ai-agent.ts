@@ -472,7 +472,12 @@ export async function generatePanelImage(
   previousImageUrl?: string
 ): Promise<string> {
   try {
-    const enhancedPrompt = `${imagePrompt}. High quality manga/anime art style, detailed illustration, professional comic book quality, clean lines, vibrant colors.`;
+    // キャラクターと画風の一貫性を保つための追加情報
+    const styleConsistencyNote = panelNumber === 1 
+      ? "Establish consistent character designs, art style, and visual tone for the entire manga series. Remember character appearances, clothing, and distinctive features."
+      : "Maintain the EXACT SAME character designs, art style, and visual tone as the previous panel. Keep character appearances, clothing, facial features, and artistic style completely consistent.";
+    
+    const enhancedPrompt = `${imagePrompt}. ${styleConsistencyNote} High quality manga/anime art style, detailed illustration, professional comic book quality, clean lines, vibrant colors.`;
     
     const options: {
       prompt: string;

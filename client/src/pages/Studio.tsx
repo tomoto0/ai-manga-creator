@@ -173,11 +173,39 @@ export default function Studio() {
   };
 
   const handleGenerateAllImages = async () => {
+    setGeneratingImages([0]); // Start with first panel
+    
     for (let i = 0; i < panels.length; i++) {
       if (!panels[i]?.imageUrl) {
-        await handleGenerateImage(i);
+        try {
+          // Get the latest panel state to ensure we have the most recent imageUrl
+          const previousImageUrl = i > 0 ? panels[i - 1]?.imageUrl : undefined;
+          
+          const result = await generateImageMutation.mutateAsync({
+            prompt: panels[i].imagePrompt,
+            previousImageUrl,
+          });
+          
+          // Update panels state immediately after each generation
+          setPanels(prev => prev.map((p, idx) => 
+            idx === i ? { ...p, imageUrl: result.url } : p
+          ));
+          
+          toast.success(`Panel ${i + 1} image generated!`);
+          
+          // Update generating state to show next panel
+          if (i < panels.length - 1) {
+            setGeneratingImages([i + 1]);
+          }
+        } catch (error) {
+          toast.error(`Failed to generate image for panel ${i + 1}`);
+          setGeneratingImages([]);
+          break; // Stop on error
+        }
       }
     }
+    
+    setGeneratingImages([]);
   };
 
   const handleUpdateDialogue = (panelIndex: number, dialogue: string) => {

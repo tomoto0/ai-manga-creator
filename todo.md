@@ -59,3 +59,10 @@
 - [x] Add image to public folder
 - [x] Add OGP meta tags to index.html
 - [x] Create new checkpoint
+
+## Phase 9: Image Consistency Improvement
+- [x] Review current image generation logic
+- [x] Change to sequential generation (each panel references previous)
+- [x] Update generatePanelImages API to generate one by one
+- [x] Test consistency across multiple panels
+- [x] Create new checkpoint
