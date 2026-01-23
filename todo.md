@@ -41,3 +41,9 @@
 - [x] Document features
 - [x] Document architecture
 - [x] Create architecture diagram
+
+## Phase 6: Fix Deploy Issue
+- [x] Remove canvas package (native dependency)
+- [x] Implement alternative JPEG generation using sharp or browser-based approach
+- [x] Update tests
+- [x] Create new checkpoint
