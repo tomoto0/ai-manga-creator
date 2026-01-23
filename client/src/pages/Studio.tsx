@@ -37,7 +37,11 @@ interface PanelData {
   imagePrompt: string;
   dialogue: string;
   imageUrl?: string;
+  dialoguePosition?: "top" | "middle" | "bottom";
+  bubbleShape?: "round" | "square" | "jagged";
 }
+
+type LayoutType = "2x2" | "2x3" | "3x2" | "1-column";
 
 const STEPS: { id: WorkflowStep; label: string; icon: React.ElementType }[] = [
   { id: "news", label: "Select News", icon: Newspaper },
@@ -59,6 +63,7 @@ export default function Studio() {
   const [editingPanel, setEditingPanel] = useState<number | null>(null);
   const [projectId, setProjectId] = useState<number | null>(null);
   const [jpegPreviewUrl, setJpegPreviewUrl] = useState<string | null>(null);
+  const [selectedLayout, setSelectedLayout] = useState<LayoutType>("2x3");
 
   const fetchNewsMutation = trpc.ai.fetchLatestNews.useMutation();
   const generateStoryMutation = trpc.ai.generateStoryProposals.useMutation();
@@ -222,10 +227,13 @@ export default function Studio() {
       const result = await generateJPEGMutation.mutateAsync({
         projectId,
         title: selectedStory.plotTitle,
+        layout: selectedLayout,
         panels: panels.map(p => ({
           panelNumber: p.panelNumber,
           imageUrl: p.imageUrl,
           dialogue: p.dialogue,
+          dialoguePosition: p.dialoguePosition,
+          bubbleShape: p.bubbleShape,
         })),
       });
       
@@ -605,14 +613,57 @@ export default function Studio() {
                         </Button>
                       </div>
                       {editingPanel === index ? (
-                        <Textarea
-                          value={panel.dialogue}
-                          onChange={(e) => handleUpdateDialogue(index, e.target.value)}
-                          className="min-h-[100px]"
-                          placeholder="Enter dialogue..."
-                        />
+                        <div className="space-y-3">
+                          <Textarea
+                            value={panel.dialogue}
+                            onChange={(e) => handleUpdateDialogue(index, e.target.value)}
+                            className="min-h-[100px]"
+                            placeholder="Enter dialogue..."
+                          />
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <label className="text-xs text-muted-foreground mb-1 block">Bubble Shape</label>
+                              <select 
+                                className="w-full px-2 py-1 text-sm border rounded"
+                                value={panel.bubbleShape || "round"}
+                                onChange={(e) => {
+                                  setPanels(prev => prev.map((p, i) => 
+                                    i === index ? { ...p, bubbleShape: e.target.value as "round" | "square" | "jagged" } : p
+                                  ));
+                                }}
+                              >
+                                <option value="round">Round</option>
+                                <option value="square">Square</option>
+                                <option value="jagged">Jagged</option>
+                              </select>
+                            </div>
+                            <div>
+                              <label className="text-xs text-muted-foreground mb-1 block">Position</label>
+                              <select 
+                                className="w-full px-2 py-1 text-sm border rounded"
+                                value={panel.dialoguePosition || "bottom"}
+                                onChange={(e) => {
+                                  setPanels(prev => prev.map((p, i) => 
+                                    i === index ? { ...p, dialoguePosition: e.target.value as "top" | "middle" | "bottom" } : p
+                                  ));
+                                }}
+                              >
+                                <option value="top">Top</option>
+                                <option value="middle">Middle</option>
+                                <option value="bottom">Bottom</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
                       ) : (
-                        <p className="text-sm text-muted-foreground">{panel.dialogue || "No dialogue"}</p>
+                        <div>
+                          <p className="text-sm text-muted-foreground mb-2">{panel.dialogue || "No dialogue"}</p>
+                          <div className="flex gap-2 text-xs text-muted-foreground">
+                            <span>{panel.bubbleShape || "round"}</span>
+                            <span>•</span>
+                            <span>{panel.dialoguePosition || "bottom"}</span>
+                          </div>
+                        </div>
                       )}
                     </CardContent>
                   </div>
@@ -644,9 +695,53 @@ export default function Studio() {
               <p className="text-muted-foreground">Preview your manga and export</p>
             </div>
 
+            {/* Layout Selection */}
+            <div className="mb-6 flex justify-center">
+              <div className="inline-flex items-center gap-2 bg-card rounded-lg border border-border p-1">
+                <span className="text-sm text-muted-foreground px-2">Layout:</span>
+                <button
+                  className={`px-3 py-1 text-sm rounded transition-colors ${
+                    selectedLayout === "2x2" ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+                  }`}
+                  onClick={() => setSelectedLayout("2x2")}
+                >
+                  2x2
+                </button>
+                <button
+                  className={`px-3 py-1 text-sm rounded transition-colors ${
+                    selectedLayout === "2x3" ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+                  }`}
+                  onClick={() => setSelectedLayout("2x3")}
+                >
+                  2x3
+                </button>
+                <button
+                  className={`px-3 py-1 text-sm rounded transition-colors ${
+                    selectedLayout === "3x2" ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+                  }`}
+                  onClick={() => setSelectedLayout("3x2")}
+                >
+                  3x2
+                </button>
+                <button
+                  className={`px-3 py-1 text-sm rounded transition-colors ${
+                    selectedLayout === "1-column" ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+                  }`}
+                  onClick={() => setSelectedLayout("1-column")}
+                >
+                  1 Column
+                </button>
+              </div>
+            </div>
+
             {/* Manga Preview Grid */}
             <div className="bg-card rounded-2xl border border-border p-8 mb-8">
-              <div className={`grid gap-4 ${panels.length <= 4 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+              <div className={`grid gap-4 ${
+                selectedLayout === "2x2" ? "grid-cols-2" :
+                selectedLayout === "2x3" ? "grid-cols-2" :
+                selectedLayout === "3x2" ? "grid-cols-3" :
+                "grid-cols-1"
+              }`}>
                 {panels.map((panel, index) => (
                   <div key={index} className="manga-panel">
                     <div className="aspect-square relative">

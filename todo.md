@@ -77,3 +77,13 @@
 - [x] Add close button for JPEG preview modal
 - [x] Test JPEG generation with Japanese text
 - [x] Create new checkpoint
+
+## Phase 12: Speech Bubble Customization & Layout Options
+- [x] Add speech bubble shape options (round, square, jagged)
+- [x] Add speech bubble position options (top, middle, bottom)
+- [x] Update database schema to store bubble preferences
+- [x] Update JPEG generator to render different bubble shapes
+- [x] Add layout selection UI (2x2, 2x3, 1-column)vertical)
+- [x] Update JPEG generator to support different layouts
+- [x] Test all combinations
+- [x] Create new checkpoint

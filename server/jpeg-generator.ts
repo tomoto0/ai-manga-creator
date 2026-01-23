@@ -4,12 +4,17 @@
  */
 
 import sharp from 'sharp';
+import { createRoundBubble, createSquareBubble, createJaggedBubble } from './bubble-shapes';
 
 interface PanelData {
   panelNumber: number;
   imageUrl?: string;
   dialogue: string;
+  dialoguePosition?: "top" | "middle" | "bottom";
+  bubbleShape?: "round" | "square" | "jagged";
 }
+
+type LayoutType = "2x2" | "2x3" | "3x2" | "1-column";
 
 /**
  * URLから画像をダウンロードしてバッファを取得
@@ -135,12 +140,35 @@ function escapeXml(text: string): string {
  */
 export async function generateMangaJPEG(
   panels: PanelData[],
-  title: string
+  title: string,
+  layout: LayoutType = "2x3"
 ): Promise<Buffer> {
   // レイアウト設定
   const panelCount = panels.length;
-  const cols = panelCount <= 4 ? 2 : 3;
-  const rows = Math.ceil(panelCount / cols);
+  let cols: number;
+  let rows: number;
+  
+  switch (layout) {
+    case "2x2":
+      cols = 2;
+      rows = Math.ceil(panelCount / 2);
+      break;
+    case "2x3":
+      cols = 2;
+      rows = Math.ceil(panelCount / 2);
+      break;
+    case "3x2":
+      cols = 3;
+      rows = Math.ceil(panelCount / 3);
+      break;
+    case "1-column":
+      cols = 1;
+      rows = panelCount;
+      break;
+    default:
+      cols = panelCount <= 4 ? 2 : 3;
+      rows = Math.ceil(panelCount / cols);
+  }
   
   const panelWidth = 400;
   const panelHeight = 400;
@@ -222,18 +250,41 @@ export async function generateMangaJPEG(
     
     // セリフボックスを追加
     const cleanDialogue = (panel.dialogue || '').replace(/^["']|["']$/g, '').trim();
-    const dialogueSvg = createTextSvg(cleanDialogue || 'No dialogue', panelWidth, dialogueHeight, {
-      fontSize: 14,
-      color: '#1a1a2e',
-      backgroundColor: '#f8f8f8',
-      borderColor: '#1a1a2e',
-      borderRadius: 10,
-      padding: 10,
-    });
+    const bubbleShape = panel.bubbleShape || 'round';
+    const dialoguePosition = panel.dialoguePosition || 'bottom';
+    
+    let dialogueSvg: string;
+    switch (bubbleShape) {
+      case 'square':
+        dialogueSvg = createSquareBubble(cleanDialogue || 'No dialogue', panelWidth, dialogueHeight, 14);
+        break;
+      case 'jagged':
+        dialogueSvg = createJaggedBubble(cleanDialogue || 'No dialogue', panelWidth, dialogueHeight, 14);
+        break;
+      case 'round':
+      default:
+        dialogueSvg = createRoundBubble(cleanDialogue || 'No dialogue', panelWidth, dialogueHeight, 14);
+        break;
+    }
+    
+    // 吹き出しの位置を計算
+    let dialogueTop: number;
+    switch (dialoguePosition) {
+      case 'top':
+        dialogueTop = panelY - dialogueHeight - 5;
+        break;
+      case 'middle':
+        dialogueTop = panelY + (panelHeight - dialogueHeight) / 2;
+        break;
+      case 'bottom':
+      default:
+        dialogueTop = panelY + panelHeight + 5;
+        break;
+    }
     
     compositeImages.push({
       input: Buffer.from(dialogueSvg),
-      top: panelY + panelHeight + 5,
+      top: Math.max(titleHeight + padding, dialogueTop), // タイトルより上にならないように
       left: x,
     });
   }

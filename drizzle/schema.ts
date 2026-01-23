@@ -40,6 +40,7 @@ export const mangaProjects = mysqlTable("manga_projects", {
   plotDescription: text("plotDescription"), // AIが生成したプロット説明
   status: mysqlEnum("status", ["draft", "in_progress", "completed"]).default("draft").notNull(),
   styleSettings: text("styleSettings"), // JSON形式のスタイル設定
+  layout: mysqlEnum("layout", ["2x2", "2x3", "3x2", "1-column"]).default("2x3"), // パネルレイアウト
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
@@ -57,7 +58,8 @@ export const mangaPanels = mysqlTable("manga_panels", {
   imagePrompt: text("imagePrompt").notNull(), // 画像生成用プロンプト
   generatedImageUrl: text("generatedImageUrl"), // 生成された画像のURL
   dialogueText: text("dialogueText"), // キャラクターのセリフ
-  dialoguePosition: varchar("dialoguePosition", { length: 50 }).default("top"), // 吹き出しの位置
+  dialoguePosition: mysqlEnum("dialoguePosition", ["top", "middle", "bottom"]).default("bottom"), // 吹き出しの位置
+  bubbleShape: mysqlEnum("bubbleShape", ["round", "square", "jagged"]).default("round"), // 吹き出しの形状
   finalImageUrl: text("finalImageUrl"), // セリフが合成された最終画像
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

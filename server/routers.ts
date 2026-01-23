@@ -102,7 +102,8 @@ export const appRouter = router({
         projectId: z.number(),
         generatedImageUrl: z.string().optional(),
         dialogueText: z.string().optional(),
-        dialoguePosition: z.string().optional(),
+        dialoguePosition: z.enum(["top", "middle", "bottom"]).optional(),
+        bubbleShape: z.enum(["round", "square", "jagged"]).optional(),
         finalImageUrl: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
@@ -191,10 +192,13 @@ export const appRouter = router({
       .input(z.object({
         projectId: z.number(),
         title: z.string().min(1),
+        layout: z.enum(["2x2", "2x3", "3x2", "1-column"]).optional(),
         panels: z.array(z.object({
           panelNumber: z.number(),
           imageUrl: z.string().optional(),
           dialogue: z.string(),
+          dialoguePosition: z.enum(["top", "middle", "bottom"]).optional(),
+          bubbleShape: z.enum(["round", "square", "jagged"]).optional(),
         })),
       }))
       .mutation(async ({ ctx, input }) => {
@@ -204,7 +208,7 @@ export const appRouter = router({
         }
         
         try {
-          const jpegBuffer = await generateMangaJPEG(input.panels, input.title);
+          const jpegBuffer = await generateMangaJPEG(input.panels, input.title, input.layout || "2x3");
           const jpegKey = `manga-jpegs/${ctx.user.id}/${input.projectId}/${Date.now()}.jpg`;
           const { url } = await storagePut(jpegKey, jpegBuffer, "image/jpeg");
           return { url, success: true };
