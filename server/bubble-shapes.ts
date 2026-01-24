@@ -1,5 +1,6 @@
 /**
  * 吹き出し形状のSVGを生成するモジュール
+ * 日本語テキストに対応した装飾されたボックス形式
  */
 
 /**
@@ -15,38 +16,60 @@ function escapeXml(text: string): string {
 }
 
 /**
- * 丸型吹き出しSVGを生成
+ * 日本語テキストを折り返す
+ * 日本語は文字単位で折り返し、英語は単語単位で折り返す
+ */
+function wrapText(text: string, maxWidth: number, fontSize: number): string[] {
+  // 日本語文字の幅は約1em、英数字は約0.5em
+  const lines: string[] = [];
+  let currentLine = '';
+  let currentWidth = 0;
+  
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    // 日本語文字かどうかを判定（CJK統合漢字、ひらがな、カタカナ）
+    const isJapanese = /[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf\u3400-\u4dbf]/.test(char);
+    const charWidth = isJapanese ? fontSize : fontSize * 0.55;
+    
+    if (currentWidth + charWidth > maxWidth && currentLine.length > 0) {
+      lines.push(currentLine);
+      currentLine = char;
+      currentWidth = charWidth;
+    } else {
+      currentLine += char;
+      currentWidth += charWidth;
+    }
+  }
+  
+  if (currentLine) {
+    lines.push(currentLine);
+  }
+  
+  return lines;
+}
+
+/**
+ * 丸型吹き出しSVGを生成（角丸の装飾された四角形）
+ * ユーザーの要望により、楕円形ではなく装飾された四角形を使用
  */
 export function createRoundBubble(
   text: string,
   width: number,
   height: number,
-  fontSize: number = 14,
-  fontFamily: string = 'Noto Sans CJK JP, sans-serif'
+  fontSize: number = 16,
+  fontFamily: string = 'Noto Sans CJK JP, Hiragino Sans, Meiryo, sans-serif'
 ): string {
-  // テキストを折り返し
-  const maxCharsPerLine = Math.floor((width - 40) / (fontSize * 0.6));
-  const words = text.split(/\s+/);
-  const lines: string[] = [];
-  let currentLine = '';
-
-  for (const word of words) {
-    if ((currentLine + ' ' + word).trim().length <= maxCharsPerLine) {
-      currentLine = (currentLine + ' ' + word).trim();
-    } else {
-      if (currentLine) lines.push(currentLine);
-      currentLine = word;
-    }
-  }
-  if (currentLine) lines.push(currentLine);
+  const padding = 15;
+  const maxWidth = width - padding * 2;
+  const lines = wrapText(text, maxWidth, fontSize);
 
   // 最大3行まで
   const displayLines = lines.slice(0, 3);
   if (lines.length > 3) {
-    displayLines[2] = displayLines[2].slice(0, -3) + '...';
+    displayLines[2] = displayLines[2].slice(0, -1) + '…';
   }
 
-  const lineHeight = fontSize * 1.3;
+  const lineHeight = fontSize * 1.4;
   const totalTextHeight = displayLines.length * lineHeight;
   const startY = (height - totalTextHeight) / 2 + fontSize;
 
@@ -56,48 +79,52 @@ export function createRoundBubble(
            fill="#1a1a2e">${escapeXml(line)}</text>`
   ).join('');
 
+  // 装飾された角丸四角形ボックス
+  const boxMargin = 8;
+  const borderRadius = 15;
+  
   return `
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-      <ellipse cx="${width/2}" cy="${height/2}" rx="${width/2 - 5}" ry="${height/2 - 5}" 
-               fill="#f8f8f8" stroke="#1a1a2e" stroke-width="2"/>
+      <!-- 影 -->
+      <rect x="${boxMargin + 3}" y="${boxMargin + 3}" 
+            width="${width - boxMargin * 2}" height="${height - boxMargin * 2}" 
+            fill="rgba(0,0,0,0.15)" rx="${borderRadius}" ry="${borderRadius}"/>
+      <!-- メインボックス -->
+      <rect x="${boxMargin}" y="${boxMargin}" 
+            width="${width - boxMargin * 2}" height="${height - boxMargin * 2}" 
+            fill="#ffffff" stroke="#6b21a8" stroke-width="2.5" 
+            rx="${borderRadius}" ry="${borderRadius}"/>
+      <!-- 内側のハイライト -->
+      <rect x="${boxMargin + 4}" y="${boxMargin + 4}" 
+            width="${width - boxMargin * 2 - 8}" height="${height - boxMargin * 2 - 8}" 
+            fill="none" stroke="rgba(107, 33, 168, 0.2)" stroke-width="1" 
+            rx="${borderRadius - 2}" ry="${borderRadius - 2}"/>
       ${textElements}
     </svg>
   `;
 }
 
 /**
- * 角型吹き出しSVGを生成
+ * 角型吹き出しSVGを生成（直角の装飾されたボックス）
  */
 export function createSquareBubble(
   text: string,
   width: number,
   height: number,
-  fontSize: number = 14,
-  fontFamily: string = 'Noto Sans CJK JP, sans-serif'
+  fontSize: number = 16,
+  fontFamily: string = 'Noto Sans CJK JP, Hiragino Sans, Meiryo, sans-serif'
 ): string {
-  // テキストを折り返し
-  const maxCharsPerLine = Math.floor((width - 40) / (fontSize * 0.6));
-  const words = text.split(/\s+/);
-  const lines: string[] = [];
-  let currentLine = '';
-
-  for (const word of words) {
-    if ((currentLine + ' ' + word).trim().length <= maxCharsPerLine) {
-      currentLine = (currentLine + ' ' + word).trim();
-    } else {
-      if (currentLine) lines.push(currentLine);
-      currentLine = word;
-    }
-  }
-  if (currentLine) lines.push(currentLine);
+  const padding = 15;
+  const maxWidth = width - padding * 2;
+  const lines = wrapText(text, maxWidth, fontSize);
 
   // 最大3行まで
   const displayLines = lines.slice(0, 3);
   if (lines.length > 3) {
-    displayLines[2] = displayLines[2].slice(0, -3) + '...';
+    displayLines[2] = displayLines[2].slice(0, -1) + '…';
   }
 
-  const lineHeight = fontSize * 1.3;
+  const lineHeight = fontSize * 1.4;
   const totalTextHeight = displayLines.length * lineHeight;
   const startY = (height - totalTextHeight) / 2 + fontSize;
 
@@ -107,10 +134,33 @@ export function createSquareBubble(
            fill="#1a1a2e">${escapeXml(line)}</text>`
   ).join('');
 
+  // 装飾された直角ボックス（漫画風の角）
+  const boxMargin = 8;
+  const cornerSize = 8;
+  
   return `
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-      <rect x="5" y="5" width="${width - 10}" height="${height - 10}" 
-            fill="#f8f8f8" stroke="#1a1a2e" stroke-width="2" rx="5" ry="5"/>
+      <!-- 影 -->
+      <rect x="${boxMargin + 3}" y="${boxMargin + 3}" 
+            width="${width - boxMargin * 2}" height="${height - boxMargin * 2}" 
+            fill="rgba(0,0,0,0.15)" rx="3" ry="3"/>
+      <!-- メインボックス -->
+      <rect x="${boxMargin}" y="${boxMargin}" 
+            width="${width - boxMargin * 2}" height="${height - boxMargin * 2}" 
+            fill="#ffffff" stroke="#1a1a2e" stroke-width="2.5" 
+            rx="3" ry="3"/>
+      <!-- 角の装飾（左上） -->
+      <path d="M ${boxMargin} ${boxMargin + cornerSize} L ${boxMargin} ${boxMargin} L ${boxMargin + cornerSize} ${boxMargin}" 
+            fill="none" stroke="#6b21a8" stroke-width="3"/>
+      <!-- 角の装飾（右上） -->
+      <path d="M ${width - boxMargin - cornerSize} ${boxMargin} L ${width - boxMargin} ${boxMargin} L ${width - boxMargin} ${boxMargin + cornerSize}" 
+            fill="none" stroke="#6b21a8" stroke-width="3"/>
+      <!-- 角の装飾（左下） -->
+      <path d="M ${boxMargin} ${height - boxMargin - cornerSize} L ${boxMargin} ${height - boxMargin} L ${boxMargin + cornerSize} ${height - boxMargin}" 
+            fill="none" stroke="#6b21a8" stroke-width="3"/>
+      <!-- 角の装飾（右下） -->
+      <path d="M ${width - boxMargin - cornerSize} ${height - boxMargin} L ${width - boxMargin} ${height - boxMargin} L ${width - boxMargin} ${height - boxMargin - cornerSize}" 
+            fill="none" stroke="#6b21a8" stroke-width="3"/>
       ${textElements}
     </svg>
   `;
@@ -123,32 +173,20 @@ export function createJaggedBubble(
   text: string,
   width: number,
   height: number,
-  fontSize: number = 14,
-  fontFamily: string = 'Noto Sans CJK JP, sans-serif'
+  fontSize: number = 16,
+  fontFamily: string = 'Noto Sans CJK JP, Hiragino Sans, Meiryo, sans-serif'
 ): string {
-  // テキストを折り返し
-  const maxCharsPerLine = Math.floor((width - 40) / (fontSize * 0.6));
-  const words = text.split(/\s+/);
-  const lines: string[] = [];
-  let currentLine = '';
-
-  for (const word of words) {
-    if ((currentLine + ' ' + word).trim().length <= maxCharsPerLine) {
-      currentLine = (currentLine + ' ' + word).trim();
-    } else {
-      if (currentLine) lines.push(currentLine);
-      currentLine = word;
-    }
-  }
-  if (currentLine) lines.push(currentLine);
+  const padding = 20;
+  const maxWidth = width - padding * 2;
+  const lines = wrapText(text, maxWidth, fontSize);
 
   // 最大3行まで
   const displayLines = lines.slice(0, 3);
   if (lines.length > 3) {
-    displayLines[2] = displayLines[2].slice(0, -3) + '...';
+    displayLines[2] = displayLines[2].slice(0, -1) + '…';
   }
 
-  const lineHeight = fontSize * 1.3;
+  const lineHeight = fontSize * 1.4;
   const totalTextHeight = displayLines.length * lineHeight;
   const startY = (height - totalTextHeight) / 2 + fontSize;
 
@@ -158,18 +196,19 @@ export function createJaggedBubble(
            fill="#1a1a2e">${escapeXml(line)}</text>`
   ).join('');
 
-  // ギザギザのパスを生成
-  const spikes = 12;
+  // ギザギザのパスを生成（爆発風）
+  const margin = 10;
   const centerX = width / 2;
   const centerY = height / 2;
-  const outerRadiusX = width / 2 - 5;
-  const outerRadiusY = height / 2 - 5;
-  const innerRadiusX = outerRadiusX * 0.85;
-  const innerRadiusY = outerRadiusY * 0.85;
+  const outerRadiusX = (width / 2) - margin;
+  const outerRadiusY = (height / 2) - margin;
+  const innerRadiusX = outerRadiusX * 0.75;
+  const innerRadiusY = outerRadiusY * 0.75;
+  const spikes = 16;
   
   let path = '';
   for (let i = 0; i < spikes * 2; i++) {
-    const angle = (i * Math.PI) / spikes;
+    const angle = (i * Math.PI) / spikes - Math.PI / 2;
     const isOuter = i % 2 === 0;
     const radiusX = isOuter ? outerRadiusX : innerRadiusX;
     const radiusY = isOuter ? outerRadiusY : innerRadiusY;
@@ -186,7 +225,13 @@ export function createJaggedBubble(
 
   return `
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-      <path d="${path}" fill="#fff5e6" stroke="#1a1a2e" stroke-width="2"/>
+      <!-- 影 -->
+      <path d="${path}" fill="rgba(0,0,0,0.15)" transform="translate(3, 3)"/>
+      <!-- メインの爆発形 -->
+      <path d="${path}" fill="#fff5e6" stroke="#e63946" stroke-width="2.5"/>
+      <!-- 内側のハイライト -->
+      <ellipse cx="${centerX}" cy="${centerY}" rx="${innerRadiusX * 0.85}" ry="${innerRadiusY * 0.85}" 
+               fill="none" stroke="rgba(230, 57, 70, 0.2)" stroke-width="1"/>
       ${textElements}
     </svg>
   `;

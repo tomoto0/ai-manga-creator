@@ -933,24 +933,60 @@ export default function Studio() {
       {/* JPEG Preview Modal */}
       {jpegPreviewUrl && (
         <div 
-          className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center p-4"
-          onClick={() => setJpegPreviewUrl(null)}
+          className="fixed inset-0 z-50 bg-black/90 flex flex-col items-center justify-center p-4"
         >
-          <div className="relative max-w-7xl max-h-[90vh] w-full">
+          {/* Top action bar */}
+          <div className="w-full max-w-7xl flex justify-between items-center mb-4">
             <Button
               variant="outline"
-              size="icon"
-              className="absolute top-4 right-4 z-10 bg-background/80 backdrop-blur-sm hover:bg-background"
+              className="bg-background/80 backdrop-blur-sm hover:bg-background"
               onClick={() => setJpegPreviewUrl(null)}
             >
-              <X className="w-4 h-4" />
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              {t.common.back}
             </Button>
+            <h2 className="text-white text-lg font-semibold">Generated Manga Preview</h2>
+            <Button
+              className="gradient-purple text-white border-0"
+              onClick={() => setJpegPreviewUrl(null)}
+            >
+              <Check className="w-4 h-4 mr-2" />
+              {t.common.done}
+            </Button>
+          </div>
+          
+          {/* Image container */}
+          <div className="relative max-w-7xl max-h-[75vh] w-full flex-1 flex items-center justify-center">
             <img 
               src={jpegPreviewUrl} 
               alt="Generated Manga" 
-              className="w-full h-full object-contain rounded-lg"
-              onClick={(e) => e.stopPropagation()}
+              className="max-w-full max-h-full object-contain rounded-lg"
             />
+          </div>
+          
+          {/* Bottom action bar */}
+          <div className="w-full max-w-7xl flex justify-center gap-4 mt-4">
+            <Button
+              variant="outline"
+              className="bg-background/80 backdrop-blur-sm hover:bg-background"
+              onClick={() => {
+                const link = document.createElement('a');
+                link.href = jpegPreviewUrl;
+                link.download = `manga-${Date.now()}.jpg`;
+                link.click();
+              }}
+            >
+              <Download className="w-4 h-4 mr-2" />
+              {t.studio.preview.downloadJPEG}
+            </Button>
+            <Button
+              variant="outline"
+              className="bg-background/80 backdrop-blur-sm hover:bg-background"
+              onClick={handleShareToX}
+            >
+              <Share2 className="w-4 h-4 mr-2" />
+              {t.studio.preview.shareToX}
+            </Button>
           </div>
         </div>
       )}

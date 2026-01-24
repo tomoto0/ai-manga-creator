@@ -125,3 +125,10 @@
 - [x] Update frontend handleGenerateAllImages to pass previous image URLs
 - [x] Test sequential image generation for consistency
 - [x] Create new checkpoint
+
+## Phase 16: JPEG Preview and Speech Bubble Fix
+- [x] Add back/done buttons to JPEG preview modal
+- [x] Fix speech bubble to use decorated rectangular box instead of ellipse
+- [x] Fix Japanese text rendering in speech bubbles
+- [x] Test JPEG generation with new speech bubble style
+- [ ] Create new checkpoint
