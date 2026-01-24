@@ -99,3 +99,21 @@
 - [x] Verify X posting functionality
 - [x] Create new checkpoint
 - [x] Update news fetching to get latest news (not old cached news)
+
+## Phase 14: Character Settings & Internationalization
+### Character Settings Feature
+- [x] Add character settings to database schema (manga_projects table)
+- [x] Create character settings UI in story step
+- [x] Update story generation to include character descriptions
+- [x] Update panel image generation to use character settings
+- [x] Ensure character consistency across all panels
+
+### Internationalization (i18n)
+- [x] Create language context and provider
+- [x] Create translation files (en.json, ja.json)
+- [x] Add language switcher to header
+- [x] Translate all UI text in Home page
+- [x] Translate all UI text in Studio page
+- [x] Translate all UI text in Gallery page
+- [x] Translate all UI text in Templates page
+- [x] Create new checkpoint

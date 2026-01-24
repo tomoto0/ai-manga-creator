@@ -1,0 +1,1 @@
+ALTER TABLE `manga_projects` ADD `characterSettings` text;

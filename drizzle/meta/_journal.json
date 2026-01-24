@@ -29,6 +29,13 @@
       "when": 1769177626058,
       "tag": "0003_foamy_jackpot",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1769263266098,
+      "tag": "0004_unique_mulholland_black",
+      "breakpoints": true
     }
   ]
 }

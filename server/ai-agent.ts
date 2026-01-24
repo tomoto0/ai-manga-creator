@@ -365,7 +365,8 @@ export async function generatePanelPrompts(
     panelCount: number;
     keyThemes: string[];
   },
-  newsContent: string
+  newsContent: string,
+  characterSettings?: string
 ): Promise<Array<{
   panelNumber: number;
   sceneDescription: string;
@@ -373,21 +374,29 @@ export async function generatePanelPrompts(
   imagePrompt: string;
 }>> {
   try {
+    const characterInstructions = characterSettings 
+      ? `\n5. STRICTLY use these character designs for visual consistency:\n${characterSettings}` 
+      : "";
+    
     const systemPrompt = `You are an expert manga storyboard artist and scriptwriter. Your task is to create a cohesive ${story.panelCount}-panel manga sequence that:
 1. STRICTLY follows the given story plot and description
 2. Creates meaningful dialogue for EVERY panel
 3. Maintains visual and narrative continuity across all panels
-4. Uses the news context as background inspiration but focuses on the STORY
+4. Uses the news context as background inspiration but focuses on the STORY${characterInstructions}
 
 IMPORTANT: Each panel MUST have dialogue. Never leave dialogue empty.
 Return ONLY a valid JSON array.`;
 
+    const characterSection = characterSettings 
+      ? `\n\n## CHARACTER DESIGNS (MUST be used consistently in all panels)\n${characterSettings}` 
+      : "";
+    
     const userPrompt = `Create a ${story.panelCount}-panel manga based on THIS SPECIFIC STORY:
 
 ## STORY DETAILS
 Title: "${story.plotTitle}"
 Plot: ${story.plotDescription}
-Key Themes: ${story.keyThemes.join(", ")}
+Key Themes: ${story.keyThemes.join(", ")}${characterSection}
 
 ## NEWS CONTEXT
 ${newsContent.substring(0, 800)}

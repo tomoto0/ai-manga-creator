@@ -1,0 +1,136 @@
+{
+  "common": {
+    "appName": "AI漫画クリエイター",
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "close": "閉じる",
+    "back": "戻る",
+    "next": "次へ",
+    "previous": "前へ",
+    "download": "ダウンロード",
+    "share": "共有",
+    "login": "ログイン",
+    "logout": "ログアウト",
+    "gallery": "ギャラリー",
+    "templates": "テンプレート",
+    "createManga": "漫画を作成"
+  },
+  "home": {
+    "poweredByAI": "AIで動作",
+    "heroTitle": "ニュースを",
+    "heroTitleHighlight": "美しい漫画に変換",
+    "heroDescription": "AIを活用した漫画制作。最新ニュースを選択し、ストーリーを生成し、パネルを作成し、セリフを追加して、あなただけの漫画を世界に共有しましょう。",
+    "startCreating": "作成を開始",
+    "viewGallery": "ギャラリーを見る"
+  },
+  "studio": {
+    "backToHome": "ホームに戻る",
+    "steps": {
+      "news": "ニュース選択",
+      "story": "ストーリー選択",
+      "panels": "パネル生成",
+      "dialogue": "セリフ編集",
+      "preview": "プレビュー"
+    },
+    "news": {
+      "title": "ニュースを選択",
+      "description": "漫画に変換する最新ニュースを選択してください",
+      "fetchNews": "最新ニュースを取得",
+      "fetching": "ニュースを取得中...",
+      "source": "ソース",
+      "selectThisNews": "このニュースを選択"
+    },
+    "story": {
+      "title": "ストーリーを選択",
+      "description": "選択したニュースに基づいてAIがストーリー案を生成しました",
+      "generateStories": "ストーリー案を生成",
+      "generating": "ストーリーを生成中...",
+      "panels": "コマ",
+      "themes": "テーマ",
+      "selectThisStory": "このストーリーを選択",
+      "characterSettings": "キャラクター設定",
+      "characterSettingsDescription": "全パネルで視覚的な一貫性を保つためにキャラクターの外見を定義します",
+      "mainCharacter": "主人公",
+      "mainCharacterPlaceholder": "例：長い黒髪、青い目、白いブラウスを着た若い女性",
+      "supportingCharacter": "サブキャラクター",
+      "supportingCharacterPlaceholder": "例：白髪、眼鏡、スーツを着た中年男性",
+      "artStyle": "画風",
+      "artStylePlaceholder": "例：柔らかいアニメ風、パステルカラー、少女漫画の美学"
+    },
+    "panels": {
+      "title": "パネル画像を生成",
+      "description": "ストーリーに基づいて漫画パネルを生成します",
+      "generatePrompts": "パネルプロンプトを生成",
+      "generatingPrompts": "プロンプトを生成中...",
+      "generateAllImages": "全画像を生成",
+      "generatingImages": "画像を生成中...",
+      "generateImage": "生成",
+      "regenerate": "再生成",
+      "panel": "パネル"
+    },
+    "dialogue": {
+      "title": "セリフを編集",
+      "description": "各パネルのセリフを追加・カスタマイズします",
+      "dialoguePlaceholder": "セリフを入力...",
+      "bubbleShape": "吹き出しの形",
+      "bubblePosition": "位置",
+      "shapes": {
+        "round": "丸型",
+        "square": "角型",
+        "jagged": "ギザギザ"
+      },
+      "positions": {
+        "top": "上",
+        "middle": "中央",
+        "bottom": "下"
+      }
+    },
+    "preview": {
+      "title": "プレビュー＆ダウンロード",
+      "description": "漫画をプレビューしてダウンロードまたは共有します",
+      "layout": "レイアウト",
+      "layouts": {
+        "2x2": "2×2 グリッド",
+        "2x3": "2×3 グリッド",
+        "3x2": "3×2 グリッド",
+        "1-column": "1列"
+      },
+      "downloadJPEG": "JPEGをダウンロード",
+      "generating": "生成中...",
+      "shareToX": "Xに共有",
+      "saveToGallery": "ギャラリーに保存",
+      "saving": "保存中...",
+      "saveAsTemplate": "テンプレートとして保存"
+    }
+  },
+  "gallery": {
+    "title": "マイ漫画ギャラリー",
+    "description": "作成した漫画を表示・管理します",
+    "empty": "まだ漫画がありません",
+    "emptyDescription": "最初の漫画を作成しましょう！",
+    "createFirst": "最初の漫画を作成",
+    "sharedOn": "共有日",
+    "viewOnX": "Xで見る"
+  },
+  "templates": {
+    "title": "漫画テンプレート",
+    "description": "お気に入りの漫画スタイルを保存して再利用",
+    "myTemplates": "マイテンプレート",
+    "publicTemplates": "公開テンプレート",
+    "empty": "テンプレートがありません",
+    "emptyDescription": "漫画をテンプレートとして保存してスタイルを再利用しましょう",
+    "uses": "回使用",
+    "useTemplate": "テンプレートを使用",
+    "makePublic": "公開する",
+    "makePrivate": "非公開にする"
+  },
+  "auth": {
+    "loginRequired": "ログインが必要です",
+    "loginDescription": "この機能にアクセスするにはログインしてください",
+    "loginButton": "Manusでログイン"
+  }
+}

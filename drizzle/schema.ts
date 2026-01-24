@@ -41,6 +41,7 @@ export const mangaProjects = mysqlTable("manga_projects", {
   status: mysqlEnum("status", ["draft", "in_progress", "completed"]).default("draft").notNull(),
   styleSettings: text("styleSettings"), // JSON形式のスタイル設定
   layout: mysqlEnum("layout", ["2x2", "2x3", "3x2", "1-column"]).default("2x3"), // パネルレイアウト
+  characterSettings: text("characterSettings"), // JSON形式のキャラクター設定
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

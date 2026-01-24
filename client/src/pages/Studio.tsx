@@ -4,15 +4,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
+import { Label } from "@/components/ui/label";
 import { getLoginUrl } from "@/const";
 import { trpc } from "@/lib/trpc";
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
 import { 
   Sparkles, Newspaper, Image, MessageSquare, Eye, Download, Share2, 
-  ArrowLeft, ArrowRight, Check, Loader2, RefreshCw, Edit2, X, ChevronLeft
+  ArrowLeft, ArrowRight, Check, Loader2, RefreshCw, Edit2, X, ChevronLeft, User, Palette
 } from "lucide-react";
 import { toast } from "sonner";
+import { useLanguage, LanguageSwitcher } from "@/contexts/LanguageContext";
 
 type WorkflowStep = "news" | "story" | "panels" | "dialogue" | "preview";
 
@@ -64,6 +66,13 @@ export default function Studio() {
   const [projectId, setProjectId] = useState<number | null>(null);
   const [jpegPreviewUrl, setJpegPreviewUrl] = useState<string | null>(null);
   const [selectedLayout, setSelectedLayout] = useState<LayoutType>("2x3");
+  
+  // Character settings for visual consistency
+  const [mainCharacter, setMainCharacter] = useState<string>("");
+  const [supportingCharacter, setSupportingCharacter] = useState<string>("");
+  const [artStyle, setArtStyle] = useState<string>("");
+  
+  const { t } = useLanguage();
 
   const fetchNewsMutation = trpc.ai.fetchLatestNews.useMutation();
   const generateStoryMutation = trpc.ai.generateStoryProposals.useMutation();
@@ -132,12 +141,20 @@ export default function Studio() {
     setCurrentStep("panels");
     
     try {
+      // Build character settings string for image generation
+      const characterSettings = [
+        mainCharacter && `Main character: ${mainCharacter}`,
+        supportingCharacter && `Supporting character: ${supportingCharacter}`,
+        artStyle && `Art style: ${artStyle}`,
+      ].filter(Boolean).join(". ");
+      
       const panelPrompts = await generatePanelsMutation.mutateAsync({
         plotTitle: story.plotTitle,
         plotDescription: story.plotDescription,
         panelCount: story.panelCount,
         keyThemes: story.keyThemes,
         newsContent: selectedNews?.summary,
+        characterSettings: characterSettings || undefined,
       });
       
       setPanels(panelPrompts.map(p => ({
@@ -422,14 +439,57 @@ export default function Studio() {
         {currentStep === "story" && (
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold mb-2">Choose Your Story</h2>
-              <p className="text-muted-foreground">Select one of the AI-generated story proposals</p>
+              <h2 className="text-3xl font-bold mb-2">{t.studio.story.title}</h2>
+              <p className="text-muted-foreground">{t.studio.story.description}</p>
             </div>
+
+            {/* Character Settings Section */}
+            <Card className="mb-8 border-primary/30">
+              <CardHeader>
+                <div className="flex items-center gap-2">
+                  <User className="w-5 h-5 text-primary" />
+                  <CardTitle className="text-lg">{t.studio.story.characterSettings}</CardTitle>
+                </div>
+                <CardDescription>{t.studio.story.characterSettingsDescription}</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="mainCharacter">{t.studio.story.mainCharacter}</Label>
+                  <Input
+                    id="mainCharacter"
+                    placeholder={t.studio.story.mainCharacterPlaceholder}
+                    value={mainCharacter}
+                    onChange={(e) => setMainCharacter(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="supportingCharacter">{t.studio.story.supportingCharacter}</Label>
+                  <Input
+                    id="supportingCharacter"
+                    placeholder={t.studio.story.supportingCharacterPlaceholder}
+                    value={supportingCharacter}
+                    onChange={(e) => setSupportingCharacter(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="artStyle" className="flex items-center gap-2">
+                    <Palette className="w-4 h-4" />
+                    {t.studio.story.artStyle}
+                  </Label>
+                  <Input
+                    id="artStyle"
+                    placeholder={t.studio.story.artStylePlaceholder}
+                    value={artStyle}
+                    onChange={(e) => setArtStyle(e.target.value)}
+                  />
+                </div>
+              </CardContent>
+            </Card>
 
             {generateStoryMutation.isPending ? (
               <div className="flex flex-col items-center justify-center py-16">
                 <div className="spinner mb-4" />
-                <p className="text-muted-foreground">Generating story proposals...</p>
+                <p className="text-muted-foreground">{t.studio.story.generating}</p>
               </div>
             ) : (
               <div className="grid gap-6">

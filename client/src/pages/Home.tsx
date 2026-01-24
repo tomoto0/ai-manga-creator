@@ -2,10 +2,12 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { getLoginUrl } from "@/const";
 import { Link } from "wouter";
-import { Sparkles, Newspaper, Image, Share2, ArrowRight, Zap, Palette, Download } from "lucide-react";
+import { Sparkles, Newspaper, Share2, ArrowRight, Zap, Palette } from "lucide-react";
+import { useLanguage, LanguageSwitcher } from "@/contexts/LanguageContext";
 
 export default function Home() {
-  const { user, loading, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
+  const { t } = useLanguage();
 
   return (
     <div className="min-h-screen bg-background">
@@ -16,17 +18,18 @@ export default function Home() {
             <div className="w-10 h-10 rounded-lg gradient-purple flex items-center justify-center">
               <Sparkles className="w-6 h-6 text-white" />
             </div>
-            <span className="font-bold text-xl">AI Manga Creator</span>
+            <span className="font-bold text-xl">{t.common.appName}</span>
           </Link>
           <div className="flex items-center gap-4">
+            <LanguageSwitcher />
             {isAuthenticated ? (
               <>
                 <Link href="/gallery">
-                  <Button variant="ghost">Gallery</Button>
+                  <Button variant="ghost">{t.common.gallery}</Button>
                 </Link>
                 <Link href="/studio">
                   <Button className="gradient-purple text-white border-0">
-                    Create Manga
+                    {t.common.createManga}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
                 </Link>
@@ -34,7 +37,7 @@ export default function Home() {
             ) : (
               <a href={getLoginUrl()}>
                 <Button className="gradient-purple text-white border-0">
-                  Sign In
+                  {t.common.login}
                   <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </a>
@@ -55,46 +58,43 @@ export default function Home() {
           <div className="max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/20 border border-primary/30 mb-8">
               <Zap className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium">Powered by AI</span>
+              <span className="text-sm font-medium">{t.home.poweredByAI}</span>
             </div>
             
             <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Transform News into
+              {t.home.heroTitle}
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
-                Stunning Manga
+                {t.home.heroTitleHighlight}
               </span>
             </h1>
             
             <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
-              AI-powered manga creation from the latest news. Select a story, generate panels, 
-              add dialogue, and share your unique manga with the world.
+              {t.home.heroDescription}
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               {isAuthenticated ? (
                 <Link href="/studio">
                   <Button size="lg" className="gradient-purple text-white border-0 px-8 py-6 text-lg glow-purple">
-                    Start Creating
+                    {t.home.startCreating}
                     <Sparkles className="w-5 h-5 ml-2" />
                   </Button>
                 </Link>
               ) : (
                 <a href={getLoginUrl()}>
                   <Button size="lg" className="gradient-purple text-white border-0 px-8 py-6 text-lg glow-purple">
-                    Get Started Free
+                    {t.home.startCreating}
                     <Sparkles className="w-5 h-5 ml-2" />
                   </Button>
                 </a>
               )}
               <Link href="/gallery">
                 <Button size="lg" variant="outline" className="px-8 py-6 text-lg">
-                  View Gallery
+                  {t.home.viewGallery}
                 </Button>
               </Link>
             </div>
           </div>
-
-
         </div>
       </section>
 
@@ -112,25 +112,25 @@ export default function Home() {
             {[
               {
                 icon: Newspaper,
-                title: "Select News",
+                title: t.studio.steps.news,
                 description: "Browse the latest news from multiple sources and pick a story that inspires you",
                 step: 1,
               },
               {
                 icon: Sparkles,
-                title: "Generate Story",
+                title: t.studio.steps.story,
                 description: "AI analyzes the news and creates unique manga plot proposals for you to choose",
                 step: 2,
               },
               {
                 icon: Palette,
-                title: "Create Panels",
+                title: t.studio.steps.panels,
                 description: "Generate stunning manga panels with AI, maintaining visual consistency",
                 step: 3,
               },
               {
                 icon: Share2,
-                title: "Share & Download",
+                title: t.studio.steps.preview,
                 description: "Export your manga as JPEG and share directly to X (Twitter)",
                 step: 4,
               },
@@ -164,14 +164,14 @@ export default function Home() {
             {isAuthenticated ? (
               <Link href="/studio">
                 <Button size="lg" className="gradient-purple text-white border-0 px-10 py-6 text-lg glow-purple">
-                  Open Studio
+                  {t.home.startCreating}
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </Link>
             ) : (
               <a href={getLoginUrl()}>
                 <Button size="lg" className="gradient-purple text-white border-0 px-10 py-6 text-lg glow-purple">
-                  Start Creating Now
+                  {t.home.startCreating}
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </a>
@@ -188,7 +188,7 @@ export default function Home() {
               <div className="w-8 h-8 rounded-lg gradient-purple flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
-              <span className="font-semibold">AI Manga Creator</span>
+              <span className="font-semibold">{t.common.appName}</span>
             </div>
             <p className="text-sm text-muted-foreground">
               Powered by Manus AI Platform

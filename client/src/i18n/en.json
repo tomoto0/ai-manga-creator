@@ -1,0 +1,136 @@
+{
+  "common": {
+    "appName": "AI Manga Creator",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "download": "Download",
+    "share": "Share",
+    "login": "Login",
+    "logout": "Logout",
+    "gallery": "Gallery",
+    "templates": "Templates",
+    "createManga": "Create Manga"
+  },
+  "home": {
+    "poweredByAI": "Powered by AI",
+    "heroTitle": "Transform News into",
+    "heroTitleHighlight": "Stunning Manga",
+    "heroDescription": "AI-powered manga creation from the latest news. Select a story, generate panels, add dialogue, and share your unique manga with the world.",
+    "startCreating": "Start Creating",
+    "viewGallery": "View Gallery"
+  },
+  "studio": {
+    "backToHome": "Back to Home",
+    "steps": {
+      "news": "Select News",
+      "story": "Choose Story",
+      "panels": "Generate Panels",
+      "dialogue": "Edit Dialogue",
+      "preview": "Preview"
+    },
+    "news": {
+      "title": "Select a News Story",
+      "description": "Choose from the latest news articles to transform into manga",
+      "fetchNews": "Fetch Latest News",
+      "fetching": "Fetching news...",
+      "source": "Source",
+      "selectThisNews": "Select This News"
+    },
+    "story": {
+      "title": "Choose Your Story",
+      "description": "AI has generated story proposals based on the selected news",
+      "generateStories": "Generate Story Proposals",
+      "generating": "Generating stories...",
+      "panels": "panels",
+      "themes": "Themes",
+      "selectThisStory": "Select This Story",
+      "characterSettings": "Character Settings",
+      "characterSettingsDescription": "Define character appearances for visual consistency across all panels",
+      "mainCharacter": "Main Character",
+      "mainCharacterPlaceholder": "e.g., Young woman with long black hair, blue eyes, wearing a white blouse",
+      "supportingCharacter": "Supporting Character",
+      "supportingCharacterPlaceholder": "e.g., Middle-aged man with gray hair, glasses, wearing a suit",
+      "artStyle": "Art Style",
+      "artStylePlaceholder": "e.g., Soft anime style, pastel colors, shoujo manga aesthetic"
+    },
+    "panels": {
+      "title": "Generate Panel Images",
+      "description": "Generate manga panels based on your story",
+      "generatePrompts": "Generate Panel Prompts",
+      "generatingPrompts": "Generating prompts...",
+      "generateAllImages": "Generate All Images",
+      "generatingImages": "Generating images...",
+      "generateImage": "Generate",
+      "regenerate": "Regenerate",
+      "panel": "Panel"
+    },
+    "dialogue": {
+      "title": "Edit Dialogue",
+      "description": "Add and customize dialogue for each panel",
+      "dialoguePlaceholder": "Enter dialogue...",
+      "bubbleShape": "Bubble Shape",
+      "bubblePosition": "Position",
+      "shapes": {
+        "round": "Round",
+        "square": "Square",
+        "jagged": "Jagged"
+      },
+      "positions": {
+        "top": "Top",
+        "middle": "Middle",
+        "bottom": "Bottom"
+      }
+    },
+    "preview": {
+      "title": "Preview & Download",
+      "description": "Preview your manga and download or share it",
+      "layout": "Layout",
+      "layouts": {
+        "2x2": "2×2 Grid",
+        "2x3": "2×3 Grid",
+        "3x2": "3×2 Grid",
+        "1-column": "1 Column"
+      },
+      "downloadJPEG": "Download JPEG",
+      "generating": "Generating...",
+      "shareToX": "Share to X",
+      "saveToGallery": "Save to Gallery",
+      "saving": "Saving...",
+      "saveAsTemplate": "Save as Template"
+    }
+  },
+  "gallery": {
+    "title": "My Manga Gallery",
+    "description": "View and manage your created manga",
+    "empty": "No manga created yet",
+    "emptyDescription": "Start creating your first manga!",
+    "createFirst": "Create Your First Manga",
+    "sharedOn": "Shared on",
+    "viewOnX": "View on X"
+  },
+  "templates": {
+    "title": "Manga Templates",
+    "description": "Save and reuse your favorite manga styles",
+    "myTemplates": "My Templates",
+    "publicTemplates": "Public Templates",
+    "empty": "No templates yet",
+    "emptyDescription": "Save a manga as a template to reuse its style",
+    "uses": "uses",
+    "useTemplate": "Use Template",
+    "makePublic": "Make Public",
+    "makePrivate": "Make Private"
+  },
+  "auth": {
+    "loginRequired": "Login Required",
+    "loginDescription": "Please login to access this feature",
+    "loginButton": "Login with Manus"
+  }
+}

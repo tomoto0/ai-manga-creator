@@ -61,6 +61,7 @@ export const aiRouter = router({
       panelCount: z.number().min(1).max(10),
       keyThemes: z.array(z.string()).optional(),
       newsContent: z.string().optional(),
+      characterSettings: z.string().optional(),
     }))
     .mutation(async ({ input }) => {
       try {
@@ -72,7 +73,8 @@ export const aiRouter = router({
         };
         const prompts = await aiAgent.generatePanelPrompts(
           story,
-          input.newsContent || ""
+          input.newsContent || "",
+          input.characterSettings
         );
         return prompts;
       } catch (error) {
