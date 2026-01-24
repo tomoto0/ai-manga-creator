@@ -117,3 +117,11 @@
 - [x] Translate all UI text in Gallery page
 - [x] Translate all UI text in Templates page
 - [x] Create new checkpoint
+
+## Phase 15: Image Consistency Improvement
+- [x] Review current image generation logic in ai-agent.ts
+- [x] Ensure previous panel image URL is passed to generateImage API
+- [x] Update generatePanelImage to use originalImages parameter for reference
+- [x] Update frontend handleGenerateAllImages to pass previous image URLs
+- [x] Test sequential image generation for consistency
+- [x] Create new checkpoint

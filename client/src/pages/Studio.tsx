@@ -179,8 +179,28 @@ export default function Studio() {
       // Get previous panel's image for consistency
       const previousImageUrl = panelIndex > 0 ? panels[panelIndex - 1]?.imageUrl : undefined;
       
+      // Build enhanced prompt with character settings for consistency
+      let enhancedPrompt = panel.imagePrompt;
+      
+      // Add character settings to prompt for visual consistency
+      const characterContext = [];
+      if (mainCharacter) characterContext.push(`Main character: ${mainCharacter}`);
+      if (supportingCharacter) characterContext.push(`Supporting character: ${supportingCharacter}`);
+      if (artStyle) characterContext.push(`Art style: ${artStyle}`);
+      
+      if (characterContext.length > 0) {
+        enhancedPrompt = `${characterContext.join(". ")}. ${enhancedPrompt}`;
+      }
+      
+      // Add consistency instruction
+      if (panelIndex === 0) {
+        enhancedPrompt += " Establish consistent character designs, art style, and visual tone for the entire manga series.";
+      } else {
+        enhancedPrompt += " Maintain the EXACT SAME character designs, art style, facial features, clothing, and visual tone as the previous panels. Ensure visual continuity.";
+      }
+      
       const result = await generateImageMutation.mutateAsync({
-        prompt: panel.imagePrompt,
+        prompt: enhancedPrompt,
         previousImageUrl,
       });
       
@@ -198,16 +218,43 @@ export default function Studio() {
   const handleGenerateAllImages = async () => {
     setGeneratingImages([0]); // Start with first panel
     
+    // Track generated image URLs locally to ensure consistency
+    const generatedUrls: (string | undefined)[] = [...panels.map(p => p.imageUrl)];
+    
     for (let i = 0; i < panels.length; i++) {
-      if (!panels[i]?.imageUrl) {
+      if (!generatedUrls[i]) {
         try {
-          // Get the latest panel state to ensure we have the most recent imageUrl
-          const previousImageUrl = i > 0 ? panels[i - 1]?.imageUrl : undefined;
+          // Get the previous panel's image URL from our local tracking
+          // This ensures we always have the most recent URL even before state updates
+          const previousImageUrl = i > 0 ? generatedUrls[i - 1] : undefined;
+          
+          // Build enhanced prompt with character settings for consistency
+          let enhancedPrompt = panels[i].imagePrompt;
+          
+          // Add character settings to prompt for visual consistency
+          const characterContext = [];
+          if (mainCharacter) characterContext.push(`Main character: ${mainCharacter}`);
+          if (supportingCharacter) characterContext.push(`Supporting character: ${supportingCharacter}`);
+          if (artStyle) characterContext.push(`Art style: ${artStyle}`);
+          
+          if (characterContext.length > 0) {
+            enhancedPrompt = `${characterContext.join(". ")}. ${enhancedPrompt}`;
+          }
+          
+          // Add consistency instruction
+          if (i === 0) {
+            enhancedPrompt += " Establish consistent character designs, art style, and visual tone for the entire manga series.";
+          } else {
+            enhancedPrompt += " Maintain the EXACT SAME character designs, art style, facial features, clothing, and visual tone as the previous panels. Ensure visual continuity.";
+          }
           
           const result = await generateImageMutation.mutateAsync({
-            prompt: panels[i].imagePrompt,
+            prompt: enhancedPrompt,
             previousImageUrl,
           });
+          
+          // Store the generated URL in our local tracking
+          generatedUrls[i] = result.url;
           
           // Update panels state immediately after each generation
           setPanels(prev => prev.map((p, idx) => 
