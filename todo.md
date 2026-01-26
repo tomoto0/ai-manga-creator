@@ -132,3 +132,15 @@
 - [x] Fix Japanese text rendering in speech bubbles
 - [x] Test JPEG generation with new speech bubble style
 - [ ] Create new checkpoint
+
+## Phase 17: English README Documentation
+- [x] Create comprehensive English README.md
+- [x] Include app overview and key features
+- [x] Add OGP promotional image
+- [x] Document technical specifications (frontend, backend, AI integration)
+- [x] Include architecture diagram
+- [x] Document database schema with all tables
+- [x] List all API endpoints with descriptions
+- [x] Add development setup and testing instructions
+- [x] Include deployment and troubleshooting guides
+- [x] Create checkpoint
