@@ -71,7 +71,7 @@ function createTextSvg(text: string, width: number, height: number, options: {
     borderColor,
     borderRadius = 0,
     padding = 10,
-    fontFamily = 'Noto Sans CJK JP, sans-serif',
+    fontFamily = 'Noto Sans CJK JP',
   } = options;
 
   // テキストを折り返し
@@ -103,7 +103,7 @@ function createTextSvg(text: string, width: number, height: number, options: {
   const textElements = displayLines.map((line, i) => 
     `<text x="50%" y="${startY + i * lineHeight}" text-anchor="${textAlign}" 
            font-family="${fontFamily}" font-size="${fontSize}" font-weight="${fontWeight}" 
-           fill="${color}">${escapeXml(line)}</text>`
+           fill="${color}" dominant-baseline="middle">${escapeXml(line)}</text>`
   ).join('');
 
   let background = '';
@@ -115,7 +115,13 @@ function createTextSvg(text: string, width: number, height: number, options: {
   }
 
   return `
-    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}">
+      <defs>
+        <style type="text/css">
+          @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
+          text { font-family: '${fontFamily}', 'Noto Sans JP', sans-serif; }
+        </style>
+      </defs>
       ${background}
       ${textElements}
     </svg>

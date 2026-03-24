@@ -1,6 +1,7 @@
 /**
  * 吹き出し形状のSVGを生成するモジュール
  * 日本語テキストに対応した装飾されたボックス形式
+ * Sharp/libvipsでの正確なレンダリングのため、フォント指定を最適化
  */
 
 /**
@@ -57,7 +58,7 @@ export function createRoundBubble(
   width: number,
   height: number,
   fontSize: number = 16,
-  fontFamily: string = 'Noto Sans CJK JP, Hiragino Sans, Meiryo, sans-serif'
+  fontFamily: string = 'Noto Sans CJK JP'
 ): string {
   const padding = 15;
   const maxWidth = width - padding * 2;
@@ -73,10 +74,11 @@ export function createRoundBubble(
   const totalTextHeight = displayLines.length * lineHeight;
   const startY = (height - totalTextHeight) / 2 + fontSize;
 
+  // SVGでのテキストレンダリング用に、フォント指定を明示的に行う
   const textElements = displayLines.map((line, i) => 
     `<text x="50%" y="${startY + i * lineHeight}" text-anchor="middle" 
            font-family="${fontFamily}" font-size="${fontSize}" font-weight="normal" 
-           fill="#1a1a2e">${escapeXml(line)}</text>`
+           fill="#1a1a2e" dominant-baseline="middle">${escapeXml(line)}</text>`
   ).join('');
 
   // 装飾された角丸四角形ボックス
@@ -84,7 +86,13 @@ export function createRoundBubble(
   const borderRadius = 15;
   
   return `
-    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}">
+      <defs>
+        <style type="text/css">
+          @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
+          text { font-family: '${fontFamily}', 'Noto Sans JP', sans-serif; }
+        </style>
+      </defs>
       <!-- 影 -->
       <rect x="${boxMargin + 3}" y="${boxMargin + 3}" 
             width="${width - boxMargin * 2}" height="${height - boxMargin * 2}" 
@@ -99,6 +107,7 @@ export function createRoundBubble(
             width="${width - boxMargin * 2 - 8}" height="${height - boxMargin * 2 - 8}" 
             fill="none" stroke="rgba(107, 33, 168, 0.2)" stroke-width="1" 
             rx="${borderRadius - 2}" ry="${borderRadius - 2}"/>
+      <!-- テキスト -->
       ${textElements}
     </svg>
   `;
@@ -112,7 +121,7 @@ export function createSquareBubble(
   width: number,
   height: number,
   fontSize: number = 16,
-  fontFamily: string = 'Noto Sans CJK JP, Hiragino Sans, Meiryo, sans-serif'
+  fontFamily: string = 'Noto Sans CJK JP'
 ): string {
   const padding = 15;
   const maxWidth = width - padding * 2;
@@ -131,7 +140,7 @@ export function createSquareBubble(
   const textElements = displayLines.map((line, i) => 
     `<text x="50%" y="${startY + i * lineHeight}" text-anchor="middle" 
            font-family="${fontFamily}" font-size="${fontSize}" font-weight="normal" 
-           fill="#1a1a2e">${escapeXml(line)}</text>`
+           fill="#1a1a2e" dominant-baseline="middle">${escapeXml(line)}</text>`
   ).join('');
 
   // 装飾された直角ボックス（漫画風の角）
@@ -139,7 +148,13 @@ export function createSquareBubble(
   const cornerSize = 8;
   
   return `
-    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}">
+      <defs>
+        <style type="text/css">
+          @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
+          text { font-family: '${fontFamily}', 'Noto Sans JP', sans-serif; }
+        </style>
+      </defs>
       <!-- 影 -->
       <rect x="${boxMargin + 3}" y="${boxMargin + 3}" 
             width="${width - boxMargin * 2}" height="${height - boxMargin * 2}" 
@@ -161,6 +176,7 @@ export function createSquareBubble(
       <!-- 角の装飾（右下） -->
       <path d="M ${width - boxMargin - cornerSize} ${height - boxMargin} L ${width - boxMargin} ${height - boxMargin} L ${width - boxMargin} ${height - boxMargin - cornerSize}" 
             fill="none" stroke="#6b21a8" stroke-width="3"/>
+      <!-- テキスト -->
       ${textElements}
     </svg>
   `;
@@ -174,7 +190,7 @@ export function createJaggedBubble(
   width: number,
   height: number,
   fontSize: number = 16,
-  fontFamily: string = 'Noto Sans CJK JP, Hiragino Sans, Meiryo, sans-serif'
+  fontFamily: string = 'Noto Sans CJK JP'
 ): string {
   const padding = 20;
   const maxWidth = width - padding * 2;
@@ -193,7 +209,7 @@ export function createJaggedBubble(
   const textElements = displayLines.map((line, i) => 
     `<text x="50%" y="${startY + i * lineHeight}" text-anchor="middle" 
            font-family="${fontFamily}" font-size="${fontSize}" font-weight="bold" 
-           fill="#1a1a2e">${escapeXml(line)}</text>`
+           fill="#1a1a2e" dominant-baseline="middle">${escapeXml(line)}</text>`
   ).join('');
 
   // ギザギザのパスを生成（爆発風）
@@ -224,7 +240,13 @@ export function createJaggedBubble(
   path += ' Z';
 
   return `
-    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}">
+      <defs>
+        <style type="text/css">
+          @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
+          text { font-family: '${fontFamily}', 'Noto Sans JP', sans-serif; }
+        </style>
+      </defs>
       <!-- 影 -->
       <path d="${path}" fill="rgba(0,0,0,0.15)" transform="translate(3, 3)"/>
       <!-- メインの爆発形 -->
@@ -232,6 +254,7 @@ export function createJaggedBubble(
       <!-- 内側のハイライト -->
       <ellipse cx="${centerX}" cy="${centerY}" rx="${innerRadiusX * 0.85}" ry="${innerRadiusY * 0.85}" 
                fill="none" stroke="rgba(230, 57, 70, 0.2)" stroke-width="1"/>
+      <!-- テキスト -->
       ${textElements}
     </svg>
   `;

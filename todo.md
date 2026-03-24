@@ -144,3 +144,12 @@
 - [x] Add development setup and testing instructions
 - [x] Include deployment and troubleshooting guides
 - [x] Create checkpoint
+
+## Phase 18: Japanese Text Rendering Fix in JPEG Output
+- [x] Identify root cause of Japanese text garbling in speech bubbles
+- [x] Check font availability in server environment
+- [x] Verify text encoding (UTF-8) in SVG generation
+- [x] Test different font options (Noto Sans CJK JP, system fonts)
+- [x] Update JPEG generator with proper font configuration
+- [x] Verify Japanese text renders correctly in all speech bubble styles
+- [x] Create checkpoint
