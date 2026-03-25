@@ -101,6 +101,7 @@
         "1-column": "1 Column"
       },
       "downloadJPEG": "Download JPEG",
+      "downloadSuccess": "Downloaded successfully!",
       "generating": "Generating...",
       "shareToX": "Share to X",
       "saveToGallery": "Save to Gallery",

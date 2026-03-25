@@ -101,6 +101,7 @@
         "1-column": "1列"
       },
       "downloadJPEG": "JPEGをダウンロード",
+      "downloadSuccess": "ダウンロード完了しました！",
       "generating": "生成中...",
       "shareToX": "Xに共有",
       "saveToGallery": "ギャラリーに保存",

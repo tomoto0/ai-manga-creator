@@ -970,10 +970,16 @@ export default function Studio() {
               variant="outline"
               className="bg-background/80 backdrop-blur-sm hover:bg-background"
               onClick={() => {
-                const link = document.createElement('a');
-                link.href = jpegPreviewUrl;
-                link.download = `manga-${Date.now()}.jpg`;
-                link.click();
+                if (jpegPreviewUrl) {
+                  const link = document.createElement('a');
+                  link.href = jpegPreviewUrl;
+                  link.download = `manga-${selectedStory?.plotTitle.replace(/\s+/g, '-') || Date.now()}.jpg`;
+                  link.setAttribute('target', '_blank');
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  toast.success(t.studio.preview.downloadSuccess || 'Downloaded successfully!');
+                }
               }}
             >
               <Download className="w-4 h-4 mr-2" />

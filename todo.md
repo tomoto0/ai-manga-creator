@@ -153,3 +153,9 @@
 - [x] Update JPEG generator with proper font configuration
 - [x] Verify Japanese text renders correctly in all speech bubble styles
 - [x] Create checkpoint
+
+## Phase 19: JPEG Download and UI Improvements
+- [x] Fix Download JPEG button to trigger immediate download
+- [x] Ensure back button returns to Preview page
+- [x] Test download functionality with various browsers
+- [x] Create checkpoint
