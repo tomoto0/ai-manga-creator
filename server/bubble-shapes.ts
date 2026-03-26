@@ -89,8 +89,7 @@ export function createRoundBubble(
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}">
       <defs>
         <style type="text/css">
-          @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
-          text { font-family: '${fontFamily}', 'Noto Sans JP', sans-serif; }
+          text { font-family: '${fontFamily}', 'Arial', sans-serif; }
         </style>
       </defs>
       <!-- 影 -->
@@ -151,8 +150,7 @@ export function createSquareBubble(
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}">
       <defs>
         <style type="text/css">
-          @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
-          text { font-family: '${fontFamily}', 'Noto Sans JP', sans-serif; }
+          text { font-family: '${fontFamily}', 'Arial', sans-serif; }
         </style>
       </defs>
       <!-- 影 -->
@@ -243,8 +241,7 @@ export function createJaggedBubble(
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}">
       <defs>
         <style type="text/css">
-          @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
-          text { font-family: '${fontFamily}', 'Noto Sans JP', sans-serif; }
+          text { font-family: '${fontFamily}', 'Arial', sans-serif; }
         </style>
       </defs>
       <!-- 影 -->
