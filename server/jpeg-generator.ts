@@ -35,17 +35,53 @@ async function fetchImageBuffer(url: string): Promise<Buffer | null> {
 }
 
 /**
- * プレースホルダー画像を生成
+ * プレースホルダー画像を生成（SVGの代わりにPNGで直接生成）
  */
 async function createPlaceholder(width: number, height: number, text: string): Promise<Buffer> {
+  // SVGの代わりに、sharpで直接PNG画像を作成
   const svg = `
     <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <style>
+          text { font-family: 'Noto Sans CJK JP', 'Arial', sans-serif; }
+        </style>
+      </defs>
       <rect width="100%" height="100%" fill="#e0e0e0"/>
       <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" 
-            font-family="sans-serif" font-size="16" fill="#666666">${text}</text>
+            font-size="16" fill="#666666">${escapeXml(text)}</text>
     </svg>
   `;
-  return sharp(Buffer.from(svg)).png().toBuffer();
+  
+  try {
+    return await sharp(Buffer.from(svg), { density: 150 })
+      .png()
+      .toBuffer();
+  } catch (error) {
+    console.error('Error creating placeholder:', error);
+    // フォールバック：単色画像を返す
+    return await sharp({
+      create: {
+        width,
+        height,
+        channels: 3,
+        background: { r: 224, g: 224, b: 224 },
+      },
+    })
+      .png()
+      .toBuffer();
+  }
+}
+
+/**
+ * XMLエスケープ処理
+ */
+function escapeXml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
 }
 
 /**
@@ -58,86 +94,56 @@ function createTextSvg(text: string, width: number, height: number, options: {
   textAlign?: string;
   backgroundColor?: string;
   borderColor?: string;
-  borderRadius?: number;
-  padding?: number;
-  fontFamily?: string;
-} = {}): string {
+} = {}): Buffer {
   const {
-    fontSize = 14,
+    fontSize = 16,
     fontWeight = 'normal',
     color = '#1a1a2e',
-    textAlign = 'middle',
-    backgroundColor = 'transparent',
-    borderColor,
-    borderRadius = 0,
-    padding = 10,
-    fontFamily = 'Noto Sans CJK JP',
+    backgroundColor = '#ffffff',
+    borderColor = '#cccccc',
   } = options;
 
-  // テキストを折り返し
-  const maxCharsPerLine = Math.floor((width - padding * 2) / (fontSize * 0.6));
-  const words = text.split(/\s+/);
-  const lines: string[] = [];
-  let currentLine = '';
-
-  for (const word of words) {
-    if ((currentLine + ' ' + word).trim().length <= maxCharsPerLine) {
-      currentLine = (currentLine + ' ' + word).trim();
-    } else {
-      if (currentLine) lines.push(currentLine);
-      currentLine = word;
-    }
-  }
-  if (currentLine) lines.push(currentLine);
-
-  // 最大3行まで
-  const displayLines = lines.slice(0, 3);
-  if (lines.length > 3) {
-    displayLines[2] = displayLines[2].slice(0, -3) + '...';
-  }
-
-  const lineHeight = fontSize * 1.3;
-  const totalTextHeight = displayLines.length * lineHeight;
-  const startY = (height - totalTextHeight) / 2 + fontSize;
-
-  const textElements = displayLines.map((line, i) => 
-    `<text x="50%" y="${startY + i * lineHeight}" text-anchor="${textAlign}" 
-           font-family="${fontFamily}" font-size="${fontSize}" font-weight="${fontWeight}" 
-           fill="${color}" dominant-baseline="middle">${escapeXml(line)}</text>`
-  ).join('');
-
-  let background = '';
-  if (backgroundColor !== 'transparent' || borderColor) {
-    background = `<rect x="0" y="0" width="${width}" height="${height}" 
-                        fill="${backgroundColor}" 
-                        ${borderColor ? `stroke="${borderColor}" stroke-width="2"` : ''}
-                        ${borderRadius ? `rx="${borderRadius}" ry="${borderRadius}"` : ''}/>`;
-  }
-
-  return `
-    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}">
+  const svg = `
+    <svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <style type="text/css">
-          @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap');
-          text { font-family: '${fontFamily}', 'Noto Sans JP', sans-serif; }
+        <style>
+          text { font-family: 'Noto Sans CJK JP', 'Arial', sans-serif; }
         </style>
       </defs>
-      ${background}
-      ${textElements}
+      <rect width="100%" height="100%" fill="${backgroundColor}" stroke="${borderColor}" stroke-width="1"/>
+      <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" 
+            font-size="${fontSize}" font-weight="${fontWeight}" fill="${color}">${escapeXml(text)}</text>
     </svg>
   `;
+
+  return Buffer.from(svg);
 }
 
 /**
- * XMLエスケープ
+ * セリフボックスを生成
  */
-function escapeXml(text: string): string {
-  return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&apos;');
+async function createDialogueSvg(
+  dialogue: string,
+  width: number,
+  height: number,
+  bubbleShape: "round" | "square" | "jagged" = "square"
+): Promise<Buffer> {
+  let bubbleSvg: string;
+
+  switch (bubbleShape) {
+    case "round":
+      bubbleSvg = createRoundBubble(dialogue, width, height);
+      break;
+    case "jagged":
+      bubbleSvg = createJaggedBubble(dialogue, width, height);
+      break;
+    case "square":
+    default:
+      bubbleSvg = createSquareBubble(dialogue, width, height);
+      break;
+  }
+
+  return Buffer.from(bubbleSvg);
 }
 
 /**
@@ -195,118 +201,123 @@ export async function generateMangaJPEG(
     fontWeight: 'bold',
     color: '#1a1a2e',
   });
-  compositeImages.push({
-    input: Buffer.from(titleSvg),
-    top: 0,
-    left: 0,
-  });
   
-  // 各パネルを処理
-  for (let i = 0; i < panels.length; i++) {
+  try {
+    const titleBuffer = await sharp(titleSvg, { density: 150 })
+      .png()
+      .toBuffer();
+    compositeImages.push({
+      input: titleBuffer,
+      top: 0,
+      left: 0,
+    });
+  } catch (error) {
+    console.error('Error rendering title:', error);
+  }
+  
+  // パネルを処理
+  for (let i = 0; i < panelCount; i++) {
     const panel = panels[i];
-    const col = i % cols;
     const row = Math.floor(i / cols);
+    const col = i % cols;
     
     const x = padding + col * (panelWidth + padding);
     const y = titleHeight + padding + row * (panelHeight + dialogueHeight + panelNumberHeight + padding);
     
-    // パネル番号を追加
-    const numberSvg = createTextSvg(`#${panel.panelNumber}`, 50, panelNumberHeight, {
-      fontSize: 14,
-      fontWeight: 'bold',
-      color: '#6b21a8',
-    });
+    // パネル画像を取得またはプレースホルダーを作成
+    let panelImageBuffer: Buffer;
+    
+    if (panel.imageUrl) {
+      const fetchedBuffer = await fetchImageBuffer(panel.imageUrl);
+      if (fetchedBuffer) {
+        try {
+          panelImageBuffer = await sharp(fetchedBuffer)
+            .resize(panelWidth, panelHeight, {
+              fit: 'cover',
+              position: 'center',
+            })
+            .png()
+            .toBuffer();
+        } catch (error) {
+          console.error(`Error processing panel image ${i}:`, error);
+          panelImageBuffer = await createPlaceholder(panelWidth, panelHeight, `Panel ${i + 1}`);
+        }
+      } else {
+        panelImageBuffer = await createPlaceholder(panelWidth, panelHeight, `Panel ${i + 1}`);
+      }
+    } else {
+      panelImageBuffer = await createPlaceholder(panelWidth, panelHeight, `Panel ${i + 1}`);
+    }
+    
     compositeImages.push({
-      input: Buffer.from(numberSvg),
+      input: panelImageBuffer,
       top: y,
       left: x,
     });
     
-    // パネル画像を追加
-    const panelY = y + panelNumberHeight;
-    let panelImage: Buffer;
-    
-    if (panel.imageUrl) {
-      const imageBuffer = await fetchImageBuffer(panel.imageUrl);
-      if (imageBuffer) {
-        // 画像をリサイズして枠を追加
-        panelImage = await sharp(imageBuffer)
-          .resize(panelWidth - 6, panelHeight - 6, { fit: 'cover' })
-          .extend({
-            top: 3,
-            bottom: 3,
-            left: 3,
-            right: 3,
-            background: { r: 26, g: 26, b: 46, alpha: 1 },
-          })
-          .png()
-          .toBuffer();
-      } else {
-        panelImage = await createPlaceholder(panelWidth, panelHeight, 'Image Error');
-      }
-    } else {
-      panelImage = await createPlaceholder(panelWidth, panelHeight, 'No Image');
-    }
-    
-    compositeImages.push({
-      input: panelImage,
-      top: panelY,
-      left: x,
+    // パネル番号を追加
+    const panelNumberSvg = createTextSvg(`Panel ${i + 1}`, panelWidth, panelNumberHeight, {
+      fontSize: 12,
+      color: '#666666',
     });
+    
+    try {
+      const panelNumberBuffer = await sharp(panelNumberSvg, { density: 150 })
+        .png()
+        .toBuffer();
+      compositeImages.push({
+        input: panelNumberBuffer,
+        top: y + panelHeight + 5,
+        left: x,
+      });
+    } catch (error) {
+      console.error(`Error rendering panel number ${i}:`, error);
+    }
     
     // セリフボックスを追加
-    const cleanDialogue = (panel.dialogue || '').replace(/^["']|["']$/g, '').trim();
-    const bubbleShape = panel.bubbleShape || 'round';
-    const dialoguePosition = panel.dialoguePosition || 'bottom';
-    
-    let dialogueSvg: string;
-    switch (bubbleShape) {
-      case 'square':
-        dialogueSvg = createSquareBubble(cleanDialogue || 'No dialogue', panelWidth, dialogueHeight, 14);
-        break;
-      case 'jagged':
-        dialogueSvg = createJaggedBubble(cleanDialogue || 'No dialogue', panelWidth, dialogueHeight, 14);
-        break;
-      case 'round':
-      default:
-        dialogueSvg = createRoundBubble(cleanDialogue || 'No dialogue', panelWidth, dialogueHeight, 14);
-        break;
+    if (panel.dialogue && panel.dialogue.trim()) {
+      const dialogueTop = y + panelHeight + panelNumberHeight + 5;
+      
+      try {
+        const dialogueSvgBuffer = await createDialogueSvg(
+          panel.dialogue,
+          panelWidth,
+          dialogueHeight,
+          panel.bubbleShape || 'square'
+        );
+        
+        const dialogueBuffer = await sharp(dialogueSvgBuffer, { density: 150 })
+          .png()
+          .toBuffer();
+        
+        compositeImages.push({
+          input: dialogueBuffer,
+          top: Math.max(titleHeight + padding, dialogueTop),
+          left: x,
+        });
+      } catch (error) {
+        console.error(`Error rendering dialogue ${i}:`, error);
+      }
     }
-    
-    // 吹き出しの位置を計算
-    let dialogueTop: number;
-    switch (dialoguePosition) {
-      case 'top':
-        dialogueTop = panelY - dialogueHeight - 5;
-        break;
-      case 'middle':
-        dialogueTop = panelY + (panelHeight - dialogueHeight) / 2;
-        break;
-      case 'bottom':
-      default:
-        dialogueTop = panelY + panelHeight + 5;
-        break;
-    }
-    
-    compositeImages.push({
-      input: Buffer.from(dialogueSvg),
-      top: Math.max(titleHeight + padding, dialogueTop), // タイトルより上にならないように
-      left: x,
-    });
   }
   
   // 白い背景を作成して合成
-  const result = await sharp({
-    create: {
-      width: canvasWidth,
-      height: canvasHeight,
-      channels: 3,
-      background: { r: 255, g: 255, b: 255 },
-    },
-  })
-    .composite(compositeImages)
-    .jpeg({ quality: 90 })
-    .toBuffer();
-  
-  return result;
+  try {
+    const result = await sharp({
+      create: {
+        width: canvasWidth,
+        height: canvasHeight,
+        channels: 3,
+        background: { r: 255, g: 255, b: 255 },
+      },
+    })
+      .composite(compositeImages)
+      .jpeg({ quality: 90 })
+      .toBuffer();
+    
+    return result;
+  } catch (error) {
+    console.error('Error compositing final image:', error);
+    throw new Error(`Failed to generate JPEG: ${error instanceof Error ? error.message : String(error)}`);
+  }
 }
